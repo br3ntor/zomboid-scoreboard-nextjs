@@ -1,20 +1,42 @@
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
 export default function Home() {
   return (
-    <main className="min-h-screen border border-sky-300 p-6 sm:p-16">
-      {/* Header container*/}
-      <header className="">
-        <h1 className="border-b border-sky-300">
-          West Coast Noobs Scoreboard 🧟‍♀️
-        </h1>
+    <>
+      <header className="border border-sky-300 sm:flex sm:flex-row sm:justify-between">
+        <h1 className="text-3xl">West Coast Noobs Scoreboard 🧟‍♀️</h1>
+        <Button>Help with server cost!</Button>
       </header>
-    </main>
-    // <main className="flex min-h-screen flex-col items-center justify-between p-24">
-    //   <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-    //     <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-    //       What the hell!&nbsp;
-    //       <code className="font-mono font-bold">test</code>
-    //     </p>
-    //   </div>
-    // </main>
+      <main className="border border-sky-300">
+        <Table className="mt-2">
+          <TableCaption>A list of your recent invoices.</TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[100px]">Invoice</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Method</TableHead>
+              <TableHead className="text-right">Amount</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow>
+              <TableCell className="font-medium">INV001</TableCell>
+              <TableCell>Paid</TableCell>
+              <TableCell>Credit Card</TableCell>
+              <TableCell className="text-right">$250.00</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </main>
+    </>
   );
 }
