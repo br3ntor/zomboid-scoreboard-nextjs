@@ -12,7 +12,7 @@ export default async function Home() {
         </Button>
       </header>
       <main>
-        <Tabs defaultValue="light">
+        <Tabs defaultValue="medium">
           <TabsList>
             <TabsTrigger value="light">Light</TabsTrigger>
             <TabsTrigger value="medium">Medium</TabsTrigger>
