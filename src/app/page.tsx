@@ -15,10 +15,14 @@ export default async function Home() {
         <Tabs defaultValue="light">
           <TabsList>
             <TabsTrigger value="light">Light</TabsTrigger>
+            <TabsTrigger value="medium">Medium</TabsTrigger>
             <TabsTrigger value="heavy">Heavy</TabsTrigger>
           </TabsList>
           <TabsContent value="light">
             <Scoreboard server="light" />
+          </TabsContent>
+          <TabsContent value="medium">
+            <Scoreboard server="medium" />
           </TabsContent>
           <TabsContent value="heavy">
             <Scoreboard server="heavy" />
