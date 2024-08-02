@@ -38,6 +38,10 @@ export default async function Scoreboard({ server }: { server: string }) {
     stats: JSON.parse(player.stats) as Stats,
     health: JSON.parse(player.health) as Health,
   }));
+  const formattedData = data
+    .sort((a, b) => b.stats.kills - a.stats.kills)
+    .slice(0, 30);
+  formattedData[0].name = formattedData[0].name.concat(" 👑");
   return (
     <Table className="border">
       <TableHeader>
@@ -51,24 +55,18 @@ export default async function Scoreboard({ server }: { server: string }) {
         </TableRow>
       </TableHeader>
       <TableBody className="bg-slate-900">
-        {data
-          .slice()
-          .sort((a, b) => b.stats.kills - a.stats.kills)
-          .slice(0, 30)
-          .map((row) => (
-            <TableRow key={row.name}>
-              <TableCell>{row.name}</TableCell>
-              <TableCell className="text-right">{row.stats.kills}</TableCell>
-              <TableCell className="text-right">{row.stats.hours}</TableCell>
-              <TableCell className="text-right">{row.health.health}</TableCell>
-              <TableCell className="text-right">
-                {row.health.infected ? "Yes" : "No"}
-              </TableCell>
-              <TableCell className="text-right">
-                {row.stats.profession}
-              </TableCell>
-            </TableRow>
-          ))}
+        {formattedData.map((row) => (
+          <TableRow key={row.name}>
+            <TableCell>{row.name}</TableCell>
+            <TableCell className="text-right">{row.stats.kills}</TableCell>
+            <TableCell className="text-right">{row.stats.hours}</TableCell>
+            <TableCell className="text-right">{row.health.health}</TableCell>
+            <TableCell className="text-right">
+              {row.health.infected ? "Yes" : "No"}
+            </TableCell>
+            <TableCell className="text-right">{row.stats.profession}</TableCell>
+          </TableRow>
+        ))}
       </TableBody>
     </Table>
   );

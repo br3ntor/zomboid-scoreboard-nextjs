@@ -7,8 +7,8 @@ import Image from "next/image";
 export default async function Home() {
   return (
     <>
-      <header className="my-5 sm:flex sm:flex-row sm:justify-between">
-        <h1 className="text-4xl">West Coast Noobs Scoreboard 🧟‍♀️</h1>
+      <header className="py-5 sm:flex sm:flex-row sm:justify-between">
+        <h1 className="text-4xl font-bold">West Coast Noobs Scoreboard 🧟‍♀️</h1>
         <Button asChild className="bg-sky-500 text-primary hover:bg-sky-600">
           <Link target="_blank" href="https://ko-fi.com/westcoastnoobs">
             <Image
@@ -22,7 +22,7 @@ export default async function Home() {
           </Link>
         </Button>
       </header>
-      <main>
+      <main className="">
         <Tabs defaultValue="medium">
           <TabsList>
             <TabsTrigger value="light">Light</TabsTrigger>
