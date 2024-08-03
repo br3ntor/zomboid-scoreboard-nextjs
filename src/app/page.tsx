@@ -13,7 +13,7 @@ export default async function Home() {
           <Link target="_blank" href="https://ko-fi.com/westcoastnoobs">
             <Image
               className="animate-wiggle"
-              src={"/favicon.png"}
+              src={"/kofi-cup.png"}
               alt="ko-fi"
               width={28}
               height={28}
