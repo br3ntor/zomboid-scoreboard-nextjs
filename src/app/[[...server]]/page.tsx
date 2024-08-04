@@ -4,7 +4,12 @@ import Scoreboard from "@/components/scoreboard";
 import Link from "next/link";
 import Image from "next/image";
 
-export default async function Home() {
+export default async function Home({
+  params,
+}: {
+  params: { server?: string[] };
+}) {
+  const defaultTab = params.server ? params.server[0] : "medium";
   return (
     <>
       <header className="py-5 sm:flex sm:flex-row sm:justify-between">
@@ -23,7 +28,7 @@ export default async function Home() {
         </Button>
       </header>
       <main className="">
-        <Tabs defaultValue="medium">
+        <Tabs defaultValue={defaultTab}>
           <TabsList>
             <TabsTrigger value="light">Light</TabsTrigger>
             <TabsTrigger value="medium">Medium</TabsTrigger>

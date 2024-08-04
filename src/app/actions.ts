@@ -1,7 +1,10 @@
 "use server";
 
 export async function getPlayerData(server: string) {
-  const res = await fetch(`https://wcn.brent-dev.com/${server}`);
+  console.log(`requesting fresh ${server} data hooray!`);
+  const res = await fetch(`https://wcn.brent-dev.com/${server}`, {
+    cache: "no-store",
+  });
 
   if (!res.ok) {
     // This will activate the closest `error.js` Error Boundary
