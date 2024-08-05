@@ -7,7 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { getPlayerData } from "@/app/actions";
+import { getPlayerData } from "@/lib/data";
 
 interface PlayerData {
   id: number;

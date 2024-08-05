@@ -30,9 +30,15 @@ export default async function Home({
       <main className="">
         <Tabs defaultValue={defaultTab}>
           <TabsList>
-            <TabsTrigger value="light">Light</TabsTrigger>
-            <TabsTrigger value="medium">Medium</TabsTrigger>
-            <TabsTrigger value="heavy">Heavy</TabsTrigger>
+            <Link href="/light">
+              <TabsTrigger value="light">Light</TabsTrigger>
+            </Link>
+            <Link href="/medium">
+              <TabsTrigger value="medium">Medium</TabsTrigger>
+            </Link>
+            <Link href="/heavy">
+              <TabsTrigger value="heavy">Heavy</TabsTrigger>
+            </Link>
           </TabsList>
           <TabsContent value="light">
             <Scoreboard server="light" />
