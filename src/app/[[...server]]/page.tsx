@@ -3,6 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Scoreboard from "@/components/scoreboard";
 import Link from "next/link";
 import Image from "next/image";
+
 import TabbedScoreboard from "@/components/tabbedscoreboard";
 
 export default async function Home({
@@ -29,18 +30,12 @@ export default async function Home({
         </Button>
       </header>
       <main className="">
-        {/* <TabbedScoreboard server={defaultTab} /> */}
+        {/* <TabbedScoreboard /> */}
         <Tabs defaultValue={defaultTab}>
           <TabsList>
-            {/* <Link href="/light" replace> */}
             <TabsTrigger value="light">Light</TabsTrigger>
-            {/* </Link> */}
-            {/* <Link href="/medium" replace> */}
             <TabsTrigger value="medium">Medium</TabsTrigger>
-            {/* </Link> */}
-            {/* <Link href="/heavy" replace> */}
             <TabsTrigger value="heavy">Heavy</TabsTrigger>
-            {/* </Link> */}
           </TabsList>
           <TabsContent value="light">
             <Scoreboard server="light" />

@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Table,
   TableBody,
@@ -9,6 +11,16 @@ import {
 
 import { getPlayerData } from "@/lib/data";
 
+interface PlayerData {
+  id: number;
+  name: string;
+  perks: string;
+  traits: string;
+  stats: string;
+  health: string;
+}
+
+// These two interfaces might be overkill but just wanted to for fun
 interface Stats {
   hours: number;
   kills: number;
@@ -19,18 +31,7 @@ interface Health {
   infected: boolean;
 }
 
-interface PlayerData {
-  id: number;
-  name: string;
-  perks: string;
-  traits: string;
-  stats: Stats;
-  health: Health;
-}
-
-type formattedData = Omit<PlayerData, "perks" | "traits">;
-
-export default async function Scoreboard({ data }: { data: formattedData[] }) {
+export default async function Scoreboard({ server }: { server: string }) {
   // const pd = (await getPlayerData(server)) as PlayerData[];
   // const data = pd.map((player) => ({
   //   // TODO: Write a function to validate the data.
@@ -42,7 +43,7 @@ export default async function Scoreboard({ data }: { data: formattedData[] }) {
   // const formattedData = data
   //   .sort((a, b) => b.stats.kills - a.stats.kills)
   //   .slice(0, 30);
-  // formattedData[0].name = formattedData[0].name.concat(" 👑");
+  formattedData[0].name = formattedData[0].name.concat(" 👑");
   return (
     <Table className="border">
       <TableHeader>
@@ -56,7 +57,7 @@ export default async function Scoreboard({ data }: { data: formattedData[] }) {
         </TableRow>
       </TableHeader>
       <TableBody className="bg-slate-900">
-        {data.map((row) => (
+        {formattedData.map((row) => (
           <TableRow key={row.name}>
             <TableCell>{row.name}</TableCell>
             <TableCell className="text-right">{row.stats.kills}</TableCell>
