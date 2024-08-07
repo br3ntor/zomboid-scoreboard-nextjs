@@ -4,8 +4,6 @@ import Scoreboard from "@/components/scoreboard";
 import Link from "next/link";
 import Image from "next/image";
 
-import TabbedScoreboard from "@/components/tabbedscoreboard";
-
 export default async function Home({
   params,
 }: {
@@ -30,7 +28,6 @@ export default async function Home({
         </Button>
       </header>
       <main className="">
-        {/* <TabbedScoreboard /> */}
         <Tabs defaultValue={defaultTab}>
           <TabsList>
             <TabsTrigger value="light">Light</TabsTrigger>
