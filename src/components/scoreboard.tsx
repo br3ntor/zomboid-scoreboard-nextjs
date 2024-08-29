@@ -1,3 +1,4 @@
+import { Noto_Sans_Mono } from "next/font/google";
 import {
   Table,
   TableBody,
@@ -8,6 +9,10 @@ import {
 } from "@/components/ui/table";
 
 import { getPlayerData } from "@/lib/data";
+
+const notoSansMono = Noto_Sans_Mono({
+  subsets: ["latin"],
+});
 
 interface PlayerData {
   id: number;
@@ -54,7 +59,7 @@ export default async function Scoreboard({ server }: { server: string }) {
           <TableHead className="text-right">Profession</TableHead>
         </TableRow>
       </TableHeader>
-      <TableBody className="bg-slate-900">
+      <TableBody className={`bg-slate-900 ${notoSansMono.className}`}>
         {formattedData.map((row) => (
           <TableRow key={row.name}>
             <TableCell>{row.name}</TableCell>
