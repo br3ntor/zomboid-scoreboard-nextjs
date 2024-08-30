@@ -27,7 +27,7 @@ export default async function Home({
           </Link>
         </Button>
       </header>
-      <main className="">
+      <main className="mb-4">
         <Tabs defaultValue={defaultTab}>
           <TabsList>
             <TabsTrigger value="light">Light</TabsTrigger>

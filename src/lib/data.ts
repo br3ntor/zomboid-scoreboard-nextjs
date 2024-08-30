@@ -10,7 +10,7 @@ export async function getPlayerData(server: string) {
 
   console.log("----------------------------");
   console.log(res.headers.get("date"));
-  console.log(`Got fresh ${server} data hooray!`);
+  console.log(`${server} data fetched`);
 
   return res.json();
 }
