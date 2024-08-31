@@ -1,4 +1,4 @@
-name: remote ssh command
+name: Deploy
 on: [push]
 jobs:
   build:
@@ -12,4 +12,6 @@ jobs:
           port: ${{ secrets.PORT }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
-          script: whoami
+          script: |
+            whoami
+            ls -la
