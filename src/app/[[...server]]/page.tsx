@@ -13,7 +13,8 @@ export default async function Home({
   return (
     <>
       <header className="py-5 sm:flex sm:flex-row sm:justify-between">
-        <h1 className="text-4xl font-bold">West Coast Noobs Scoreboard 🧟‍♀️</h1>
+        {/* <h1 className="text-4xl font-bold">West Coast Noobs Scoreboard 🧟‍♀️</h1> */}
+        <h1 className="text-4xl font-bold">West Coast Noobs Scoreboard 🤰</h1>
         <Button asChild className="bg-sky-500 text-primary hover:bg-sky-600">
           <Link target="_blank" href="https://ko-fi.com/westcoastnoobs">
             <Image
