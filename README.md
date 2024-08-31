@@ -5,3 +5,5 @@ Scoreboard for the Project Zomboid Servers.
 Okay it's working can I haz updated badge?
 
 More tests...
+
+This last try before I give up this method
