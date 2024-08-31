@@ -3,3 +3,5 @@
 Scoreboard for the Project Zomboid Servers.
 
 Okay it's working can I haz updated badge?
+
+More tests...
