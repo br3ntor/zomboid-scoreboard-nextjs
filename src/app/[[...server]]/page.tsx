@@ -34,6 +34,8 @@ export default async function Home({
             <TabsTrigger value="medium">Medium</TabsTrigger>
             <TabsTrigger value="heavy">Heavy</TabsTrigger>
           </TabsList>
+          <p>🧟‍♂️🧟‍♂️🧟‍♂️</p>
+          <p>Test zombies please ignore</p>
           <TabsContent value="light">
             <Scoreboard server="light" />
           </TabsContent>
