@@ -87,7 +87,7 @@ export default async function Scoreboard({ server }: { server: string }) {
       <TableBody className={`bg-slate-900 ${notoSansMono.className}`}>
         {formattedData.map((row) => (
           <TableRow key={row.name}>
-            <TableCell className="text-center">{row.rank}</TableCell>
+            <TableCell className="px-0 text-center">{row.rank}</TableCell>
             <TableCell>{row.name}</TableCell>
             <TableCell className="text-right">{row.stats.kills}</TableCell>
             <TableCell className="text-right">
