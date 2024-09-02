@@ -43,27 +43,34 @@ export default async function Scoreboard({ server }: { server: string }) {
     name: player.name,
     stats: JSON.parse(player.stats) as Stats,
     health: JSON.parse(player.health) as Health,
-    rank: -1,
+    rank: "",
   }));
   const formattedData = data
     .sort((a, b) => b.stats.kills - a.stats.kills)
     .slice(0, 30);
-  formattedData[0].name = formattedData[0].name.concat(" 👑");
-  formattedData[2].name = formattedData[2].name.concat(" 🥛");
-  if (server === "light") {
-    formattedData[1].name = formattedData[1].name.concat(" 🥗");
-  } else if (server === "medium") {
-    formattedData[1].name = formattedData[1].name.concat(" 🥔");
-  } else if (server === "heavy") {
-    formattedData[1].name = formattedData[1].name.concat(" 🍖");
-  }
+
+  // Add the ranks
   for (let i = 0; i <= formattedData.length; i++) {
     // There is an undefined entry in here being created from idk where yes
     // but I will figure it out eventually, for now we will just go around it.
     if (formattedData[i]) {
-      formattedData[i].rank = i + 1;
+      formattedData[i].rank = (i + 1).toString();
     }
   }
+
+  formattedData[0].rank = "👑 " + formattedData[0].rank;
+  formattedData[2].rank = "🥛 " + formattedData[2].rank;
+
+  const emoji = {
+    light: "🥗 ",
+    medium: "🥔 ",
+    heavy: "🍖 ",
+  };
+  const validServer =
+    server === "light" || server === "medium" || server === "heavy";
+  const secondPlace = validServer ? emoji[server] : "🤡";
+  formattedData[1].rank = secondPlace + formattedData[1].rank;
+
   return (
     <Table className="border">
       <TableHeader>
