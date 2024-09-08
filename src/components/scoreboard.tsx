@@ -37,6 +37,12 @@ interface Health {
 // TODO: Add rank, truncate time survived
 export default async function Scoreboard({ server }: { server: string }) {
   const pd = (await getPlayerData(server)) as PlayerData[];
+
+  // For now, just this
+  if (pd.length < 3) {
+    return "Not enough data";
+  }
+
   const data = pd.map((player) => ({
     // TODO: Write a function to validate the data.
     id: player.id,
