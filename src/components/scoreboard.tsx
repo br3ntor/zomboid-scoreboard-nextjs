@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { Noto_Sans_Mono } from "next/font/google";
 import {
   Table,
@@ -7,15 +10,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-import { getPlayerData } from "@/lib/data";
-
-const notoSansMono = Noto_Sans_Mono({
-  subsets: ["latin"],
-});
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetClose,
+} from "@/components/ui/sheet";
 
 interface PlayerData {
-  //id: number;
   name: string;
   perks: string;
   traits: string;
@@ -23,7 +27,6 @@ interface PlayerData {
   health: string;
 }
 
-// These two interfaces might be overkill but just wanted to for fun
 interface Stats {
   hours: number;
   kills: number;
@@ -34,78 +37,131 @@ interface Health {
   infected: boolean;
 }
 
-// TODO: Add rank, truncate time survived
-export default async function Scoreboard({ server }: { server: string }) {
-  const pd = (await getPlayerData()) as PlayerData[];
+const notoSansMono = Noto_Sans_Mono({ subsets: ["latin"] });
 
-  // For now, just this
-  if (pd.length < 3) {
-    return "Not enough data";
-  }
+export default function Scoreboard({ server, playerData }: { server: string; playerData: PlayerData[] }) {
+  const [selectedPlayer, setSelectedPlayer] = useState<any | null>(null);
 
-  const data = pd.map((player) => ({
-    // TODO: Write a function to validate the data.
+  if (!playerData || playerData.length < 3) return <div>Not enough data</div>;
+
+  const data = playerData.map((player) => ({
     name: player.name,
     stats: JSON.parse(player.stats) as Stats,
     health: JSON.parse(player.health) as Health,
+    perks: JSON.parse(player.perks),
+    traits: JSON.parse(player.traits),
     rank: "",
   }));
   const formattedData = data
     .sort((a, b) => b.stats.kills - a.stats.kills)
     .slice(0, 30);
-
-  // Add the ranks
-  for (let i = 0; i <= formattedData.length; i++) {
-    // There is an undefined entry in here being created from idk where yes
-    // but I will figure it out eventually, for now we will just go around it.
+  for (let i = 0; i < formattedData.length; i++) {
     if (formattedData[i]) {
       formattedData[i].rank = (i + 1).toString();
     }
   }
-
-  formattedData[0].rank = "👑 " + formattedData[0].rank;
-  //formattedData[2].rank = "🥛 " + formattedData[2].rank;
-
- // const emoji = {
- //   light: "🥗 ",
- //   medium: "🥔 ",
- //   heavy: "🍖 ",
- // };
- // const validServer =
- //   server === "light" || server === "medium" || server === "heavy";
- // const secondPlace = validServer ? emoji[server] : "🤡";
- // formattedData[1].rank = secondPlace + formattedData[1].rank;
+  if (formattedData[0]) {
+    formattedData[0].rank = "👑 " + formattedData[0].rank;
+  }
 
   return (
-    <Table className="border">
-      <TableHeader>
-        <TableRow className="hover:bg-inherit">
-          <TableHead className="pr-0">Rank</TableHead>
-          <TableHead>Name</TableHead>
-          <TableHead className="text-right">Kills</TableHead>
-          <TableHead className="text-right">Time Survived</TableHead>
-          <TableHead className="text-right">Health</TableHead>
-          <TableHead className="text-right">Infected</TableHead>
-          <TableHead className="text-right">Profession</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody className={`bg-slate-900 ${notoSansMono.className}`}>
-        {formattedData.map((row) => (
-          <TableRow key={row.name}>
-            <TableCell className="px-0 text-center">{row.rank}</TableCell>
-            <TableCell>{row.name}</TableCell>
-            <TableCell className="text-right">{row.stats.kills}</TableCell>
-            <TableCell className="text-right">
-              {Math.floor(row.stats.hours)}
-            </TableCell>
-            <TableCell className="text-right">{row.health.health}</TableCell>
-            <TableCell className="text-right">
-              {row.health.infected ? "Yes" : "No"}
-            </TableCell>
-            <TableCell className="text-right">{row.stats.profession}</TableCell>
+    <>
+
+      <Table className="border">
+        <TableHeader>
+          <TableRow className="hover:bg-inherit">
+            <TableHead className="pr-0">Rank</TableHead>
+            <TableHead>Name</TableHead>
+            <TableHead className="text-right">Kills</TableHead>
+            <TableHead className="text-right">Time Survived</TableHead>
+            <TableHead className="text-right">Health</TableHead>
+            <TableHead className="text-right">Infected</TableHead>
+            <TableHead className="text-right">Profession</TableHead>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody className={`bg-slate-900 ${notoSansMono.className}`}>
+          {formattedData.map((row) => (
+            <TableRow key={row.name}>
+              <TableCell className="px-0 text-center">{row.rank}</TableCell>
+              <TableCell>
+                <button
+                  className="text-blue-400 hover:underline focus:outline-none"
+                  onClick={() => setSelectedPlayer(row)}
+                  type="button"
+                >
+                  {row.name}
+                </button>
+              </TableCell>
+              <TableCell className="text-right">{row.stats.kills}</TableCell>
+              <TableCell className="text-right">
+                {Math.floor(row.stats.hours)}
+              </TableCell>
+              <TableCell className="text-right">{row.health.health}</TableCell>
+              <TableCell className="text-right">
+                {row.health.infected ? "Yes" : "No"}
+              </TableCell>
+              <TableCell className="text-right">{row.stats.profession}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      <Sheet open={!!selectedPlayer} onOpenChange={(open) => !open && setSelectedPlayer(null)}>
+        <SheetContent side="right" className="w-[400px] sm:w-[540px] overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>
+              {selectedPlayer?.name}
+            </SheetTitle>
+            <SheetDescription>
+              Player Details
+            </SheetDescription>
+          </SheetHeader>
+          {selectedPlayer && (
+            <div className="mt-4 space-y-4">
+              <div>
+                <div className="font-semibold">Stats</div>
+                <ul className="ml-4 list-disc">
+                  <li>Kills: {selectedPlayer.stats.kills}</li>
+                  <li>Time Survived: {selectedPlayer.stats.hours} hours</li>
+                  <li>Profession: {selectedPlayer.stats.profession}</li>
+                </ul>
+              </div>
+              <div>
+                <div className="font-semibold">Health</div>
+                <ul className="ml-4 list-disc">
+                  <li>Health: {selectedPlayer.health.health}</li>
+                  <li>Infected: {selectedPlayer.health.infected ? "Yes" : "No"}</li>
+                </ul>
+              </div>
+              <div>
+                <div className="font-semibold">Traits</div>
+                <ul className="ml-4 list-disc">
+                  {Array.isArray(selectedPlayer.traits)
+                    ? selectedPlayer.traits.map((trait: string) => (
+                      <li key={trait}>{trait}</li>
+                    ))
+                    : null}
+                </ul>
+              </div>
+              <div>
+                <div className="font-semibold">Perks</div>
+                <ul className="ml-4 list-disc">
+                  {selectedPlayer.perks &&
+                    Object.entries(selectedPlayer.perks).map(
+                      ([perk, value]: [string, any]) => (
+                        <li key={perk}>
+                          {perk}: {value}
+                        </li>
+                      )
+                    )}
+                </ul>
+              </div>
+            </div>
+          )}
+          <SheetClose asChild>
+            <button className="mt-6 w-full rounded bg-slate-800 py-2 text-white hover:bg-slate-700">Close</button>
+          </SheetClose>
+        </SheetContent>
+      </Sheet>
+    </>
   );
 }

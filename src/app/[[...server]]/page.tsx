@@ -3,6 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Scoreboard from "@/components/scoreboard";
 import Link from "next/link";
 import Image from "next/image";
+import { getPlayerData } from "@/lib/data";
 
 export default async function Home({
   params,
@@ -10,8 +11,9 @@ export default async function Home({
   params: { server?: string[] };
 }) {
   const defaultTab = params.server ? params.server[0] : "medium";
+  const playerData = await getPlayerData();
   return (
-    <>
+    <div className="container mx-auto">
       <header className="py-5 sm:flex sm:flex-row sm:justify-between">
         <h1 className="mb-3 text-4xl font-bold">
           West Coast Noobs Scoreboard 🧟‍♀️
@@ -30,8 +32,8 @@ export default async function Home({
         </Button>
       </header>
       <main className="mb-4">
-	      <Scoreboard server="light" />
+        <Scoreboard server="light" playerData={playerData} />
       </main>
-    </>
+    </div>
   );
 }
