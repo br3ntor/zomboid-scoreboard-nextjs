@@ -1,5 +1,5 @@
-export async function getPlayerData(server: string) {
-  const res = await fetch(`https://wcn.brent-dev.com/${server}`, {
+export async function getPlayerData() {
+  const res = await fetch("https://wcn.westcoastnoobs.com/players", {
     cache: "no-store",
   });
 
@@ -10,7 +10,7 @@ export async function getPlayerData(server: string) {
 
   console.log("----------------------------");
   console.log(res.headers.get("date"));
-  console.log(`${server} data fetched`);
+  console.log("Player data fetched.");
 
   return res.json();
 }

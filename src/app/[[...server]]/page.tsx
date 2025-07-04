@@ -30,22 +30,7 @@ export default async function Home({
         </Button>
       </header>
       <main className="mb-4">
-        <Tabs defaultValue={defaultTab}>
-          <TabsList>
-            <TabsTrigger value="light">Light</TabsTrigger>
-            <TabsTrigger value="medium">Medium</TabsTrigger>
-            <TabsTrigger value="heavy">Heavy</TabsTrigger>
-          </TabsList>
-          <TabsContent value="light">
-            <Scoreboard server="light" />
-          </TabsContent>
-          <TabsContent value="medium">
-            <Scoreboard server="medium" />
-          </TabsContent>
-          <TabsContent value="heavy">
-            <Scoreboard server="heavy" />
-          </TabsContent>
-        </Tabs>
+	      <Scoreboard server="light" />
       </main>
     </>
   );

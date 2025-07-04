@@ -15,7 +15,7 @@ const notoSansMono = Noto_Sans_Mono({
 });
 
 interface PlayerData {
-  id: number;
+  //id: number;
   name: string;
   perks: string;
   traits: string;
@@ -36,7 +36,7 @@ interface Health {
 
 // TODO: Add rank, truncate time survived
 export default async function Scoreboard({ server }: { server: string }) {
-  const pd = (await getPlayerData(server)) as PlayerData[];
+  const pd = (await getPlayerData()) as PlayerData[];
 
   // For now, just this
   if (pd.length < 3) {
@@ -45,7 +45,6 @@ export default async function Scoreboard({ server }: { server: string }) {
 
   const data = pd.map((player) => ({
     // TODO: Write a function to validate the data.
-    id: player.id,
     name: player.name,
     stats: JSON.parse(player.stats) as Stats,
     health: JSON.parse(player.health) as Health,
@@ -65,17 +64,17 @@ export default async function Scoreboard({ server }: { server: string }) {
   }
 
   formattedData[0].rank = "👑 " + formattedData[0].rank;
-  formattedData[2].rank = "🥛 " + formattedData[2].rank;
+  //formattedData[2].rank = "🥛 " + formattedData[2].rank;
 
-  const emoji = {
-    light: "🥗 ",
-    medium: "🥔 ",
-    heavy: "🍖 ",
-  };
-  const validServer =
-    server === "light" || server === "medium" || server === "heavy";
-  const secondPlace = validServer ? emoji[server] : "🤡";
-  formattedData[1].rank = secondPlace + formattedData[1].rank;
+ // const emoji = {
+ //   light: "🥗 ",
+ //   medium: "🥔 ",
+ //   heavy: "🍖 ",
+ // };
+ // const validServer =
+ //   server === "light" || server === "medium" || server === "heavy";
+ // const secondPlace = validServer ? emoji[server] : "🤡";
+ // formattedData[1].rank = secondPlace + formattedData[1].rank;
 
   return (
     <Table className="border">
