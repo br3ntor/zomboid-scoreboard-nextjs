@@ -18,6 +18,7 @@ import {
   SheetDescription,
   SheetClose,
 } from "@/components/ui/sheet";
+import { Progress } from "@/components/ui/progress";
 
 interface PlayerData {
   name: string;
@@ -39,7 +40,13 @@ interface Health {
 
 const notoSansMono = Noto_Sans_Mono({ subsets: ["latin"] });
 
-export default function Scoreboard({ server, playerData }: { server: string; playerData: PlayerData[] }) {
+export default function Scoreboard({
+  server,
+  playerData,
+}: {
+  server: string;
+  playerData: PlayerData[];
+}) {
   const [selectedPlayer, setSelectedPlayer] = useState<any | null>(null);
 
   if (!playerData || playerData.length < 3) return <div>Not enough data</div>;
@@ -66,7 +73,6 @@ export default function Scoreboard({ server, playerData }: { server: string; pla
 
   return (
     <>
-
       <Table className="border">
         <TableHeader>
           <TableRow className="hover:bg-inherit">
@@ -100,20 +106,21 @@ export default function Scoreboard({ server, playerData }: { server: string; pla
               <TableCell className="text-right">
                 {row.health.infected ? "Yes" : "No"}
               </TableCell>
-              <TableCell className="text-right">{row.stats.profession}</TableCell>
+              <TableCell className="text-right">
+                {row.stats.profession}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
-      <Sheet open={!!selectedPlayer} onOpenChange={(open) => !open && setSelectedPlayer(null)}>
-        <SheetContent side="right" className="w-[400px] sm:w-[540px] overflow-y-auto">
+      <Sheet
+        open={!!selectedPlayer}
+        onOpenChange={(open) => !open && setSelectedPlayer(null)}
+      >
+        <SheetContent side="right" className="overflow-y-auto sm:max-w-lg">
           <SheetHeader>
-            <SheetTitle>
-              {selectedPlayer?.name}
-            </SheetTitle>
-            <SheetDescription>
-              Player Details
-            </SheetDescription>
+            <SheetTitle>{selectedPlayer?.name}</SheetTitle>
+            <SheetDescription>Player Details</SheetDescription>
           </SheetHeader>
           {selectedPlayer && (
             <div className="mt-4 space-y-4">
@@ -129,36 +136,52 @@ export default function Scoreboard({ server, playerData }: { server: string; pla
                 <div className="font-semibold">Health</div>
                 <ul className="ml-4 list-disc">
                   <li>Health: {selectedPlayer.health.health}</li>
-                  <li>Infected: {selectedPlayer.health.infected ? "Yes" : "No"}</li>
+                  <li>
+                    Infected: {selectedPlayer.health.infected ? "Yes" : "No"}
+                  </li>
                 </ul>
               </div>
               <div>
                 <div className="font-semibold">Traits</div>
-                <ul className="ml-4 list-disc">
+                <p className="ml-4">
                   {Array.isArray(selectedPlayer.traits)
-                    ? selectedPlayer.traits.map((trait: string) => (
-                      <li key={trait}>{trait}</li>
-                    ))
-                    : null}
-                </ul>
+                    ? selectedPlayer.traits.join(", ")
+                    : ""}
+                </p>
               </div>
               <div>
                 <div className="font-semibold">Perks</div>
-                <ul className="ml-4 list-disc">
+                <ul className="ml-4 list-none space-y-2">
                   {selectedPlayer.perks &&
                     Object.entries(selectedPlayer.perks).map(
                       ([perk, value]: [string, any]) => (
                         <li key={perk}>
-                          {perk}: {value}
+                          <div className="mb-1 break-words capitalize">
+                            {perk}
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <div className="flex-1">
+                              <Progress
+                                value={
+                                  Math.max(0, Math.min(10, Number(value))) * 10
+                                }
+                              />
+                            </div>
+                            <span className="ml-2 w-6 text-right tabular-nums">
+                              {value}
+                            </span>
+                          </div>
                         </li>
-                      )
+                      ),
                     )}
                 </ul>
               </div>
             </div>
           )}
           <SheetClose asChild>
-            <button className="mt-6 w-full rounded bg-slate-800 py-2 text-white hover:bg-slate-700">Close</button>
+            <button className="mt-6 w-full rounded bg-slate-800 py-2 text-white hover:bg-slate-700">
+              Close
+            </button>
           </SheetClose>
         </SheetContent>
       </Sheet>

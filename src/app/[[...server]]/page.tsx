@@ -13,7 +13,7 @@ export default async function Home({
   const defaultTab = params.server ? params.server[0] : "medium";
   const playerData = await getPlayerData();
   return (
-    <div className="container mx-auto">
+    <div className="mx-auto px-3 md:container lg:max-w-6xl">
       <header className="py-5 sm:flex sm:flex-row sm:justify-between">
         <h1 className="mb-3 text-4xl font-bold">
           West Coast Noobs Scoreboard 🧟‍♀️
