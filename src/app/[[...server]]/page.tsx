@@ -8,9 +8,10 @@ import { getPlayerData } from "@/lib/data";
 export default async function Home({
   params,
 }: {
-  params: { server?: string[] };
+  params: Promise<{ server?: string[] }>;
 }) {
-  const defaultTab = params.server ? params.server[0] : "medium";
+  const { server } = await params;
+  const defaultTab = server ? server[0] : "medium";
   const playerData = await getPlayerData();
   return (
     <div className="mx-auto px-3 md:container lg:max-w-6xl">
