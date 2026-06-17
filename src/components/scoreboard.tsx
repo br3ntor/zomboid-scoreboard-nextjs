@@ -19,56 +19,32 @@ import {
   SheetClose,
 } from "@/components/ui/sheet";
 import { Progress } from "@/components/ui/progress";
-
-interface PlayerData {
-  name: string;
-  perks: string;
-  traits: string;
-  stats: string;
-  health: string;
-}
-
-interface Stats {
-  hours: number;
-  kills: number;
-  profession: string;
-}
-interface Health {
-  health: number;
-  infected: boolean;
-}
+import type { NormalizedPlayer } from "@/lib/normalize";
 
 const notoSansMono = Noto_Sans_Mono({ subsets: ["latin"] });
 
+type Row = NormalizedPlayer & { rank: string };
+
 export default function Scoreboard({
-  server,
   playerData,
 }: {
-  server: string;
-  playerData: PlayerData[];
+  playerData: NormalizedPlayer[];
 }) {
-  const [selectedPlayer, setSelectedPlayer] = useState<any | null>(null);
+  const [selectedPlayer, setSelectedPlayer] = useState<NormalizedPlayer | null>(
+    null,
+  );
 
-  if (!playerData || playerData.length < 3) return <div>Not enough data</div>;
+  if (!playerData || playerData.length === 0)
+    return <div>No players yet</div>;
 
-  const data = playerData.map((player) => ({
-    name: player.name,
-    stats: JSON.parse(player.stats) as Stats,
-    health: JSON.parse(player.health) as Health,
-    perks: JSON.parse(player.perks),
-    traits: JSON.parse(player.traits),
-    rank: "",
-  }));
-  const formattedData = data
-    .sort((a, b) => b.stats.kills - a.stats.kills)
-    .slice(0, 30);
-  for (let i = 0; i < formattedData.length; i++) {
-    if (formattedData[i]) {
-      formattedData[i].rank = (i + 1).toString();
-    }
-  }
-  if (formattedData[0]) {
-    formattedData[0].rank = "👑 " + formattedData[0].rank;
+  const data: Row[] = playerData
+    .slice()
+    .sort((a, b) => b.kills - a.kills)
+    .slice(0, 30)
+    .map((player, i) => ({ ...player, rank: (i + 1).toString() }));
+
+  if (data[0]) {
+    data[0].rank = "👑 " + data[0].rank;
   }
 
   return (
@@ -82,12 +58,14 @@ export default function Scoreboard({
             <TableHead className="text-right">Time Survived</TableHead>
             <TableHead className="text-right">Health</TableHead>
             <TableHead className="text-right">Infected</TableHead>
+            <TableHead className="text-right">Online</TableHead>
+            <TableHead className="text-right">Status</TableHead>
             <TableHead className="text-right">Profession</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody className={`bg-slate-900 ${notoSansMono.className}`}>
-          {formattedData.map((row) => (
-            <TableRow key={row.name}>
+          {data.map((row) => (
+            <TableRow key={row.username}>
               <TableCell className="px-0 text-center">{row.rank}</TableCell>
               <TableCell>
                 <button
@@ -95,20 +73,28 @@ export default function Scoreboard({
                   onClick={() => setSelectedPlayer(row)}
                   type="button"
                 >
-                  {row.name}
+                  {row.displayName}
                 </button>
               </TableCell>
-              <TableCell className="text-right">{row.stats.kills}</TableCell>
+              <TableCell className="text-right">{row.kills}</TableCell>
               <TableCell className="text-right">
-                {Math.floor(row.stats.hours)}
+                {Math.floor(row.hours)}
               </TableCell>
-              <TableCell className="text-right">{row.health.health}</TableCell>
+              <TableCell className="text-right">{row.health}</TableCell>
               <TableCell className="text-right">
-                {row.health.infected ? "Yes" : "No"}
+                {row.infected ? "Yes" : "No"}
               </TableCell>
               <TableCell className="text-right">
-                {row.stats.profession}
+                {row.online === null ? "—" : row.online ? "Yes" : "No"}
               </TableCell>
+              <TableCell className="text-right">
+                {row.isDead === null
+                  ? "—"
+                  : row.isDead
+                    ? "Dead"
+                    : "Alive"}
+              </TableCell>
+              <TableCell className="text-right">{row.profession}</TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -119,7 +105,7 @@ export default function Scoreboard({
       >
         <SheetContent side="right" className="overflow-y-auto sm:max-w-lg">
           <SheetHeader>
-            <SheetTitle>{selectedPlayer?.name}</SheetTitle>
+            <SheetTitle>{selectedPlayer?.displayName}</SheetTitle>
             <SheetDescription>Player Details</SheetDescription>
           </SheetHeader>
           {selectedPlayer && (
@@ -127,20 +113,52 @@ export default function Scoreboard({
               <div>
                 <div className="font-semibold">Stats</div>
                 <ul className="ml-4 list-disc">
-                  <li>Kills: {selectedPlayer.stats.kills}</li>
-                  <li>Time Survived: {selectedPlayer.stats.hours} hours</li>
-                  <li>Profession: {selectedPlayer.stats.profession}</li>
+                  <li>Kills: {selectedPlayer.kills}</li>
+                  <li>Time Survived: {selectedPlayer.hours} hours</li>
+                  <li>Profession: {selectedPlayer.profession}</li>
                 </ul>
               </div>
               <div>
                 <div className="font-semibold">Health</div>
                 <ul className="ml-4 list-disc">
-                  <li>Health: {selectedPlayer.health.health}</li>
+                  <li>Health: {selectedPlayer.health}</li>
                   <li>
-                    Infected: {selectedPlayer.health.infected ? "Yes" : "No"}
+                    Infected: {selectedPlayer.infected ? "Yes" : "No"}
                   </li>
                 </ul>
               </div>
+              {(selectedPlayer.online !== null ||
+                selectedPlayer.isDead !== null ||
+                selectedPlayer.faction !== null ||
+                selectedPlayer.gender !== null ||
+                selectedPlayer.forename !== null) && (
+                <div>
+                  <div className="font-semibold">Status</div>
+                  <ul className="ml-4 list-disc">
+                    {selectedPlayer.online !== null && (
+                      <li>Online: {selectedPlayer.online ? "Yes" : "No"}</li>
+                    )}
+                    {selectedPlayer.isDead !== null && (
+                      <li>
+                        Status: {selectedPlayer.isDead ? "Dead" : "Alive"}
+                      </li>
+                    )}
+                    {selectedPlayer.faction !== null && (
+                      <li>Faction: {selectedPlayer.faction}</li>
+                    )}
+                    {selectedPlayer.gender !== null && (
+                      <li>Gender: {selectedPlayer.gender}</li>
+                    )}
+                    {selectedPlayer.forename !== null &&
+                      selectedPlayer.surname !== null && (
+                        <li>
+                          Character: {selectedPlayer.forename}{" "}
+                          {selectedPlayer.surname}
+                        </li>
+                      )}
+                  </ul>
+                </div>
+              )}
               <div>
                 <div className="font-semibold">Traits</div>
                 <p className="ml-4">
