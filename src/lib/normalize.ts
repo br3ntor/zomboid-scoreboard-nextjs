@@ -18,16 +18,41 @@ export interface NormalizedPlayer {
   perks: Record<string, number>;
 }
 
+export class NormalizeError extends Error {
+  constructor(
+    message: string,
+    public readonly cause?: unknown,
+  ) {
+    super(message);
+    this.name = "NormalizeError";
+  }
+}
+
+function safeJsonParse<T>(raw: string, context: string): T {
+  try {
+    return JSON.parse(raw) as T;
+  } catch (e) {
+    throw new NormalizeError(
+      `Failed to parse ${context} as JSON: ${(e as Error).message}`,
+      e,
+    );
+  }
+}
+
+interface B41Stats {
+  hours: number;
+  kills: number;
+  profession: string;
+}
+
+interface B41Health {
+  health: number;
+  infected: boolean;
+}
+
 export function normalizeB41Player(player: B41Player): NormalizedPlayer {
-  const stats = JSON.parse(player.stats) as {
-    hours: number;
-    kills: number;
-    profession: string;
-  };
-  const health = JSON.parse(player.health) as {
-    health: number;
-    infected: boolean;
-  };
+  const stats = safeJsonParse<B41Stats>(player.stats, "stats");
+  const health = safeJsonParse<B41Health>(player.health, "health");
   return {
     displayName: player.name,
     username: player.name,
@@ -42,8 +67,8 @@ export function normalizeB41Player(player: B41Player): NormalizedPlayer {
     gender: null,
     forename: null,
     surname: null,
-    traits: JSON.parse(player.traits) as string[],
-    perks: JSON.parse(player.perks) as Record<string, number>,
+    traits: safeJsonParse<string[]>(player.traits, "traits"),
+    perks: safeJsonParse<Record<string, number>>(player.perks, "perks"),
   };
 }
 
@@ -64,8 +89,8 @@ export function normalizeB42Player(player: B42Player): NormalizedPlayer {
     isDead: player.is_dead,
     faction: player.faction?.trim() ? player.faction : null,
     gender: player.gender,
-    forename: player.forename?.trim() ? player.forename : null,
-    surname: player.surname?.trim() ? player.surname : null,
+    forename: forename ? player.forename : null,
+    surname: surname ? player.surname : null,
     traits: player.traits,
     perks: player.perks,
   };

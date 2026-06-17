@@ -20,32 +20,49 @@ import {
 } from "@/components/ui/sheet";
 import { Progress } from "@/components/ui/progress";
 import type { NormalizedPlayer } from "@/lib/normalize";
+import type { Result } from "@/lib/result";
+
+const MAX_LEADERBOARD_ROWS = 30;
 
 const notoSansMono = Noto_Sans_Mono({ subsets: ["latin"] });
 
 type Row = NormalizedPlayer & { rank: string };
 
 export default function Scoreboard({
-  playerData,
+  result,
 }: {
-  playerData: NormalizedPlayer[];
+  result: Result<NormalizedPlayer[]>;
 }) {
   const [selectedPlayer, setSelectedPlayer] = useState<NormalizedPlayer | null>(
     null,
   );
 
-  if (!playerData || playerData.length === 0)
-    return <div>No players yet</div>;
+  if (result.status === "error") {
+    return (
+      <div
+        role="alert"
+        className="rounded border border-red-500/50 bg-red-950/30 p-4 text-red-200"
+      >
+        <p className="font-semibold">Could not load scoreboard</p>
+        <p className="mt-1 text-sm opacity-90">{result.error.message}</p>
+      </div>
+    );
+  }
 
-  const data: Row[] = playerData
+  const players = result.data;
+  if (players.length === 0) return <div>No players yet</div>;
+
+  const data: Row[] = players
     .slice()
     .sort((a, b) => b.kills - a.kills)
-    .slice(0, 30)
-    .map((player, i) => ({ ...player, rank: (i + 1).toString() }));
-
-  if (data[0]) {
-    data[0].rank = "👑 " + data[0].rank;
-  }
+    .slice(0, MAX_LEADERBOARD_ROWS)
+    .map((player, i) => {
+      const rankNumber = (i + 1).toString();
+      return {
+        ...player,
+        rank: i === 0 ? `👑 ${rankNumber}` : rankNumber,
+      };
+    });
 
   return (
     <>
@@ -162,36 +179,33 @@ export default function Scoreboard({
               <div>
                 <div className="font-semibold">Traits</div>
                 <p className="ml-4">
-                  {Array.isArray(selectedPlayer.traits)
-                    ? selectedPlayer.traits.join(", ")
-                    : ""}
+                  {selectedPlayer.traits.join(", ")}
                 </p>
               </div>
               <div>
                 <div className="font-semibold">Perks</div>
                 <ul className="ml-4 list-none space-y-2">
-                  {selectedPlayer.perks &&
-                    Object.entries(selectedPlayer.perks).map(
-                      ([perk, value]: [string, any]) => (
-                        <li key={perk}>
-                          <div className="mb-1 break-words capitalize">
-                            {perk}
+                  {Object.entries(selectedPlayer.perks).map(
+                    ([perk, value]: [string, number]) => (
+                      <li key={perk}>
+                        <div className="mb-1 break-words capitalize">
+                          {perk}
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <div className="flex-1">
+                            <Progress
+                              value={
+                                Math.max(0, Math.min(10, value)) * 10
+                              }
+                            />
                           </div>
-                          <div className="flex items-center space-x-2">
-                            <div className="flex-1">
-                              <Progress
-                                value={
-                                  Math.max(0, Math.min(10, Number(value))) * 10
-                                }
-                              />
-                            </div>
-                            <span className="ml-2 w-6 text-right tabular-nums">
-                              {value}
-                            </span>
-                          </div>
-                        </li>
-                      ),
-                    )}
+                          <span className="ml-2 w-6 text-right tabular-nums">
+                            {value}
+                          </span>
+                        </div>
+                      </li>
+                    ),
+                  )}
                 </ul>
               </div>
             </div>

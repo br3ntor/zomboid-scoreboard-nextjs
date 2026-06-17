@@ -5,20 +5,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { getB41PlayerData, getB42PlayerData } from "@/lib/data";
 import { normalizeB41Player, normalizeB42Player } from "@/lib/normalize";
+import { tryAsync } from "@/lib/result";
 
-export default async function Home({
-  params,
-}: {
-  params: Promise<{ server?: string[] }>;
-}) {
-  const { server } = await params;
-  const defaultTab = server ? server[0] : "b41-modded";
-  const [b41Raw, b42Raw] = await Promise.all([
-    getB41PlayerData(),
-    getB42PlayerData(),
+export default async function Home() {
+  const [b41Result, b42Result] = await Promise.all([
+    tryAsync(async () => (await getB41PlayerData()).map(normalizeB41Player)),
+    tryAsync(async () => (await getB42PlayerData()).map(normalizeB42Player)),
   ]);
-  const b41Data = b41Raw.map(normalizeB41Player);
-  const b42Data = b42Raw.map(normalizeB42Player);
   return (
     <div className="mx-auto px-3 md:container lg:max-w-6xl">
       <header className="py-5 sm:flex sm:flex-row sm:justify-between">
@@ -39,16 +32,16 @@ export default async function Home({
         </Button>
       </header>
       <main className="mb-4">
-        <Tabs defaultValue={defaultTab}>
+        <Tabs defaultValue="b42-modded">
           <TabsList>
             <TabsTrigger value="b41-modded">b41-modded</TabsTrigger>
             <TabsTrigger value="b42-modded">b42-modded</TabsTrigger>
           </TabsList>
           <TabsContent value="b41-modded">
-            <Scoreboard playerData={b41Data} />
+            <Scoreboard result={b41Result} />
           </TabsContent>
           <TabsContent value="b42-modded">
-            <Scoreboard playerData={b42Data} />
+            <Scoreboard result={b42Result} />
           </TabsContent>
         </Tabs>
       </main>
