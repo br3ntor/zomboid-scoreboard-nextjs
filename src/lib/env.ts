@@ -15,6 +15,6 @@ export const env = {
   ),
   B42_API_URL: parseUrl(
     "B42_API_URL",
-    "http://127.0.0.1:8080/api/leaderboard/kills",
+    "https://b42.westcoastnoobs.com/api/leaderboard/kills",
   ),
 } as const;

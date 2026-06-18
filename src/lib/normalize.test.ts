@@ -51,7 +51,6 @@ describe("normalizeB41Player", () => {
       profession: "Engineer",
       health: 80,
       infected: false,
-      online: null,
       isDead: null,
       faction: null,
       gender: null,

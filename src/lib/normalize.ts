@@ -8,7 +8,6 @@ export interface NormalizedPlayer {
   profession: string;
   health: number;
   infected: boolean;
-  online: boolean | null;
   isDead: boolean | null;
   faction: string | null;
   gender: string | null;
@@ -61,7 +60,6 @@ export function normalizeB41Player(player: B41Player): NormalizedPlayer {
     profession: stats.profession,
     health: health.health,
     infected: health.infected,
-    online: null,
     isDead: null,
     faction: null,
     gender: null,
@@ -85,7 +83,6 @@ export function normalizeB42Player(player: B42Player): NormalizedPlayer {
     profession: player.profession,
     health: player.health.overall_body_health,
     infected: player.health.is_infected,
-    online: player.is_online,
     isDead: player.is_dead,
     faction: player.faction?.trim() ? player.faction : null,
     gender: player.gender,

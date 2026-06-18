@@ -75,8 +75,6 @@ export default function Scoreboard({
             <TableHead className="text-right">Time Survived</TableHead>
             <TableHead className="text-right">Health</TableHead>
             <TableHead className="text-right">Infected</TableHead>
-            <TableHead className="text-right">Online</TableHead>
-            <TableHead className="text-right">Status</TableHead>
             <TableHead className="text-right">Profession</TableHead>
           </TableRow>
         </TableHeader>
@@ -90,26 +88,18 @@ export default function Scoreboard({
                   onClick={() => setSelectedPlayer(row)}
                   type="button"
                 >
-                  {row.displayName}
+                  {row.username}
                 </button>
               </TableCell>
               <TableCell className="text-right">{row.kills}</TableCell>
               <TableCell className="text-right">
                 {Math.floor(row.hours)}
               </TableCell>
-              <TableCell className="text-right">{row.health}</TableCell>
+              <TableCell className="text-right">
+                {Math.floor(row.health)}
+              </TableCell>
               <TableCell className="text-right">
                 {row.infected ? "Yes" : "No"}
-              </TableCell>
-              <TableCell className="text-right">
-                {row.online === null ? "—" : row.online ? "Yes" : "No"}
-              </TableCell>
-              <TableCell className="text-right">
-                {row.isDead === null
-                  ? "—"
-                  : row.isDead
-                    ? "Dead"
-                    : "Alive"}
               </TableCell>
               <TableCell className="text-right">{row.profession}</TableCell>
             </TableRow>
@@ -122,7 +112,7 @@ export default function Scoreboard({
       >
         <SheetContent side="right" className="overflow-y-auto sm:max-w-lg">
           <SheetHeader>
-            <SheetTitle>{selectedPlayer?.displayName}</SheetTitle>
+            <SheetTitle>{selectedPlayer?.username}</SheetTitle>
             <SheetDescription>Player Details</SheetDescription>
           </SheetHeader>
           {selectedPlayer && (
@@ -131,30 +121,26 @@ export default function Scoreboard({
                 <div className="font-semibold">Stats</div>
                 <ul className="ml-4 list-disc">
                   <li>Kills: {selectedPlayer.kills}</li>
-                  <li>Time Survived: {selectedPlayer.hours} hours</li>
+                  <li>
+                    Time Survived: {Math.floor(selectedPlayer.hours)} hours
+                  </li>
                   <li>Profession: {selectedPlayer.profession}</li>
                 </ul>
               </div>
               <div>
                 <div className="font-semibold">Health</div>
                 <ul className="ml-4 list-disc">
-                  <li>Health: {selectedPlayer.health}</li>
-                  <li>
-                    Infected: {selectedPlayer.infected ? "Yes" : "No"}
-                  </li>
+                  <li>Health: {Math.floor(selectedPlayer.health)}</li>
+                  <li>Infected: {selectedPlayer.infected ? "Yes" : "No"}</li>
                 </ul>
               </div>
-              {(selectedPlayer.online !== null ||
-                selectedPlayer.isDead !== null ||
+              {(selectedPlayer.isDead !== null ||
                 selectedPlayer.faction !== null ||
                 selectedPlayer.gender !== null ||
                 selectedPlayer.forename !== null) && (
                 <div>
                   <div className="font-semibold">Status</div>
                   <ul className="ml-4 list-disc">
-                    {selectedPlayer.online !== null && (
-                      <li>Online: {selectedPlayer.online ? "Yes" : "No"}</li>
-                    )}
                     {selectedPlayer.isDead !== null && (
                       <li>
                         Status: {selectedPlayer.isDead ? "Dead" : "Alive"}
@@ -178,9 +164,7 @@ export default function Scoreboard({
               )}
               <div>
                 <div className="font-semibold">Traits</div>
-                <p className="ml-4">
-                  {selectedPlayer.traits.join(", ")}
-                </p>
+                <p className="ml-4">{selectedPlayer.traits.join(", ")}</p>
               </div>
               <div>
                 <div className="font-semibold">Perks</div>
@@ -194,9 +178,7 @@ export default function Scoreboard({
                         <div className="flex items-center space-x-2">
                           <div className="flex-1">
                             <Progress
-                              value={
-                                Math.max(0, Math.min(10, value)) * 10
-                              }
+                              value={Math.max(0, Math.min(10, value)) * 10}
                             />
                           </div>
                           <span className="ml-2 w-6 text-right tabular-nums">
