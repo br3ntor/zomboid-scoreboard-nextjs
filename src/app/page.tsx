@@ -44,20 +44,20 @@ export default async function Home() {
         </Button>
       </header>
       <main className="mb-4">
-        <Tabs defaultValue="b42-modded">
+        <Tabs defaultValue="b42-vanilla">
           <TabsList>
             <TabsTrigger value="b41-modded">b41-modded</TabsTrigger>
-            <TabsTrigger value="b42-modded">b42-modded</TabsTrigger>
             <TabsTrigger value="b42-vanilla">b42-vanilla</TabsTrigger>
+            <TabsTrigger value="b42-modded">b42-modded</TabsTrigger>
           </TabsList>
           <TabsContent value="b41-modded">
             <Scoreboard result={b41Result} />
           </TabsContent>
-          <TabsContent value="b42-modded">
-            <Scoreboard result={b42Result} />
-          </TabsContent>
           <TabsContent value="b42-vanilla">
             <VanillaScoreboard result={b42VanillaResult} />
+          </TabsContent>
+          <TabsContent value="b42-modded">
+            <Scoreboard result={b42Result} />
           </TabsContent>
         </Tabs>
       </main>

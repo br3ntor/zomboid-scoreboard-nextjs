@@ -49,20 +49,22 @@ export default function VanillaScoreboard({
     });
 
   return (
-    <Table className="border">
+    <Table className="table-fixed border">
       <TableHeader>
         <TableRow className="hover:bg-inherit">
-          <TableHead className="pr-0">Rank</TableHead>
-          <TableHead>Name</TableHead>
-          <TableHead className="text-right">Kills</TableHead>
+          <TableHead className="w-1/3 text-center">Rank</TableHead>
+          <TableHead className="w-1/3 text-center">Name</TableHead>
+          <TableHead className="w-1/3 text-center">Kills</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody className={`bg-slate-900 ${notoSansMono.className}`}>
         {data.map((row) => (
           <TableRow key={row.username}>
-            <TableCell className="px-0 text-center">{row.rank}</TableCell>
-            <TableCell>{row.username}</TableCell>
-            <TableCell className="text-right">{row.kills}</TableCell>
+            <TableCell className="text-center">{row.rank}</TableCell>
+            <TableCell className="break-words text-center">
+              {row.username}
+            </TableCell>
+            <TableCell className="text-center">{row.kills}</TableCell>
           </TableRow>
         ))}
       </TableBody>
