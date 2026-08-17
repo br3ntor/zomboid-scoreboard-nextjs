@@ -1,4 +1,9 @@
-import type { B41Player, B42Player } from "./data";
+import type { B41Player, B42Player, B42VanillaPlayer } from "./data";
+
+export interface VanillaPlayer {
+  username: string;
+  kills: number;
+}
 
 export interface NormalizedPlayer {
   displayName: string;
@@ -90,5 +95,14 @@ export function normalizeB42Player(player: B42Player): NormalizedPlayer {
     surname: surname ? player.surname : null,
     traits: player.traits,
     perks: player.perks,
+  };
+}
+
+export function normalizeB42VanillaPlayer(
+  player: B42VanillaPlayer,
+): VanillaPlayer {
+  return {
+    username: player.username,
+    kills: player.score,
   };
 }

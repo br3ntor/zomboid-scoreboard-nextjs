@@ -3,8 +3,9 @@ import {
   NormalizeError,
   normalizeB41Player,
   normalizeB42Player,
+  normalizeB42VanillaPlayer,
 } from "./normalize";
-import type { B41Player, B42Player } from "./data";
+import type { B41Player, B42Player, B42VanillaPlayer } from "./data";
 
 function makeB41(overrides: Partial<B41Player> = {}): B41Player {
   return {
@@ -36,6 +37,17 @@ function makeB42(overrides: Partial<B42Player> = {}): B42Player {
     },
     traits: ["Brave", "Lucky"],
     perks: { Fitness: 3, Strength: 5 },
+    ...overrides,
+  };
+}
+
+function makeB42Vanilla(
+  overrides: Partial<B42VanillaPlayer> = {},
+): B42VanillaPlayer {
+  return {
+    username: "vanilla_bob",
+    score: 1500,
+    playtime_seconds: 7200,
     ...overrides,
   };
 }
@@ -73,21 +85,21 @@ describe("normalizeB41Player", () => {
   });
 
   it("throws NormalizeError when stats JSON is malformed", () => {
-    expect(() =>
-      normalizeB41Player(makeB41({ stats: "not json" })),
-    ).toThrow(NormalizeError);
+    expect(() => normalizeB41Player(makeB41({ stats: "not json" }))).toThrow(
+      NormalizeError,
+    );
   });
 
   it("throws NormalizeError when health JSON is malformed", () => {
-    expect(() =>
-      normalizeB41Player(makeB41({ health: "{" })),
-    ).toThrow(NormalizeError);
+    expect(() => normalizeB41Player(makeB41({ health: "{" }))).toThrow(
+      NormalizeError,
+    );
   });
 
   it("throws NormalizeError when traits JSON is malformed", () => {
-    expect(() =>
-      normalizeB41Player(makeB41({ traits: "[broken" })),
-    ).toThrow(NormalizeError);
+    expect(() => normalizeB41Player(makeB41({ traits: "[broken" }))).toThrow(
+      NormalizeError,
+    );
   });
 
   it("NormalizeError preserves the underlying cause", () => {
@@ -151,5 +163,23 @@ describe("normalizeB42Player", () => {
     expect(result.hours).toBe(12.5);
     expect(result.health).toBe(50);
     expect(result.infected).toBe(true);
+  });
+});
+
+describe("normalizeB42VanillaPlayer", () => {
+  it("maps score to kills and preserves username", () => {
+    const result = normalizeB42VanillaPlayer(makeB42Vanilla());
+    expect(result).toEqual({
+      username: "vanilla_bob",
+      kills: 1500,
+    });
+  });
+
+  it("handles custom score and username", () => {
+    const result = normalizeB42VanillaPlayer(
+      makeB42Vanilla({ username: "custom_user", score: 9999 }),
+    );
+    expect(result.username).toBe("custom_user");
+    expect(result.kills).toBe(9999);
   });
 });

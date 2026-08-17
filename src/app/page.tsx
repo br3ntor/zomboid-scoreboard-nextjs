@@ -1,16 +1,28 @@
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Scoreboard from "@/components/scoreboard";
+import VanillaScoreboard from "@/components/vanilla-scoreboard";
 import Link from "next/link";
 import Image from "next/image";
-import { getB41PlayerData, getB42PlayerData } from "@/lib/data";
-import { normalizeB41Player, normalizeB42Player } from "@/lib/normalize";
+import {
+  getB41PlayerData,
+  getB42PlayerData,
+  getB42VanillaPlayerData,
+} from "@/lib/data";
+import {
+  normalizeB41Player,
+  normalizeB42Player,
+  normalizeB42VanillaPlayer,
+} from "@/lib/normalize";
 import { tryAsync } from "@/lib/result";
 
 export default async function Home() {
-  const [b41Result, b42Result] = await Promise.all([
+  const [b41Result, b42Result, b42VanillaResult] = await Promise.all([
     tryAsync(async () => (await getB41PlayerData()).map(normalizeB41Player)),
     tryAsync(async () => (await getB42PlayerData()).map(normalizeB42Player)),
+    tryAsync(async () =>
+      (await getB42VanillaPlayerData()).map(normalizeB42VanillaPlayer),
+    ),
   ]);
   return (
     <div className="mx-auto px-3 md:container lg:max-w-6xl">
@@ -36,12 +48,16 @@ export default async function Home() {
           <TabsList>
             <TabsTrigger value="b41-modded">b41-modded</TabsTrigger>
             <TabsTrigger value="b42-modded">b42-modded</TabsTrigger>
+            <TabsTrigger value="b42-vanilla">b42-vanilla</TabsTrigger>
           </TabsList>
           <TabsContent value="b41-modded">
             <Scoreboard result={b41Result} />
           </TabsContent>
           <TabsContent value="b42-modded">
             <Scoreboard result={b42Result} />
+          </TabsContent>
+          <TabsContent value="b42-vanilla">
+            <VanillaScoreboard result={b42VanillaResult} />
           </TabsContent>
         </Tabs>
       </main>

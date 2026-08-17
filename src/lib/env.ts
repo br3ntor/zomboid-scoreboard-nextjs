@@ -15,6 +15,10 @@ export const env = {
   ),
   B42_API_URL: parseUrl(
     "B42_API_URL",
-    "https://b42.westcoastnoobs.com/api/leaderboard/kills",
+    "https://pz.westcoastnoobs.com/api/leaderboard/kills",
+  ),
+  B42_VANILLA_API_URL: parseUrl(
+    "B42_VANILLA_API_URL",
+    "https://pz.westcoastnoobs.com/api/leaderboard/vanilla/kills",
   ),
 } as const;

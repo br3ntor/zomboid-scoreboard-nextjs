@@ -35,15 +35,26 @@ export interface B42Response {
   players: B42Player[];
 }
 
+export interface B42VanillaPlayer {
+  username: string;
+  score: number;
+  playtime_seconds: number;
+}
+
+export interface B42VanillaResponse {
+  server: string;
+  generated_at: string;
+  snapshot_player_count: number;
+  players: B42VanillaPlayer[];
+}
+
 export async function fetchJson<T>(url: string): Promise<T> {
   const res = await fetch(url, {
     cache: "no-store",
     signal: AbortSignal.timeout(5_000),
   });
   if (!res.ok) {
-    throw new Error(
-      `Failed to fetch ${url}: ${res.status} ${res.statusText}`,
-    );
+    throw new Error(`Failed to fetch ${url}: ${res.status} ${res.statusText}`);
   }
   return res.json() as Promise<T>;
 }
@@ -54,5 +65,10 @@ export async function getB41PlayerData(): Promise<B41Player[]> {
 
 export async function getB42PlayerData(): Promise<B42Player[]> {
   const data = await fetchJson<B42Response>(env.B42_API_URL);
+  return data.players;
+}
+
+export async function getB42VanillaPlayerData(): Promise<B42VanillaPlayer[]> {
+  const data = await fetchJson<B42VanillaResponse>(env.B42_VANILLA_API_URL);
   return data.players;
 }
