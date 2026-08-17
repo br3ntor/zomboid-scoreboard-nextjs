@@ -3,3 +3,4 @@
 Scoreboard for the Project Zomboid Servers.
 
 I predict it will work.
+Message to trigger github action just as a test
