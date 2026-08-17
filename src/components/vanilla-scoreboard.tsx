@@ -10,7 +10,7 @@ import {
 import type { VanillaPlayer } from "@/lib/normalize";
 import type { Result } from "@/lib/result";
 
-const MAX_LEADERBOARD_ROWS = 30;
+const MAX_LEADERBOARD_ROWS = 50;
 
 const notoSansMono = Noto_Sans_Mono({ subsets: ["latin"] });
 
