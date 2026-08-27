@@ -13,7 +13,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
           script: |
-            echo "try again and again"
+            echo "This one will work!"
             whoami
             hostname
             pwd
