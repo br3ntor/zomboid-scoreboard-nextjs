@@ -4,22 +4,23 @@ import Scoreboard from "@/components/scoreboard";
 import VanillaScoreboard from "@/components/vanilla-scoreboard";
 import Link from "next/link";
 import Image from "next/image";
+import { getB42ModdedPlayerData, getB42VanillaPlayerData } from "@/lib/data";
 import {
-  getB41PlayerData,
-  getB42PlayerData,
-  getB42VanillaPlayerData,
-} from "@/lib/data";
-import {
-  normalizeB41Player,
-  normalizeB42Player,
+  normalizeB42ModdedPlayer,
   normalizeB42VanillaPlayer,
 } from "@/lib/normalize";
 import { tryAsync } from "@/lib/result";
 
+// b41-modded tab decommissioned; see git history to bring it back.
+// import { getB41PlayerData } from "@/lib/data";
+// import { normalizeB41Player } from "@/lib/normalize";
+
 export default async function Home() {
-  const [b41Result, b42Result, b42VanillaResult] = await Promise.all([
-    tryAsync(async () => (await getB41PlayerData()).map(normalizeB41Player)),
-    tryAsync(async () => (await getB42PlayerData()).map(normalizeB42Player)),
+  const [b42ModdedResult, b42VanillaResult] = await Promise.all([
+    // tryAsync(async () => (await getB41PlayerData()).map(normalizeB41Player)),
+    tryAsync(async () =>
+      (await getB42ModdedPlayerData()).map(normalizeB42ModdedPlayer),
+    ),
     tryAsync(async () =>
       (await getB42VanillaPlayerData()).map(normalizeB42VanillaPlayer),
     ),
@@ -46,18 +47,18 @@ export default async function Home() {
       <main className="mb-4">
         <Tabs defaultValue="b42-vanilla">
           <TabsList>
-            <TabsTrigger value="b41-modded">b41-modded</TabsTrigger>
+            {/* <TabsTrigger value="b41-modded">b41-modded</TabsTrigger> */}
             <TabsTrigger value="b42-vanilla">b42-vanilla</TabsTrigger>
             <TabsTrigger value="b42-modded">b42-modded</TabsTrigger>
           </TabsList>
-          <TabsContent value="b41-modded">
+          {/* <TabsContent value="b41-modded">
             <Scoreboard result={b41Result} />
-          </TabsContent>
+          </TabsContent> */}
           <TabsContent value="b42-vanilla">
             <VanillaScoreboard result={b42VanillaResult} />
           </TabsContent>
           <TabsContent value="b42-modded">
-            <Scoreboard result={b42Result} />
+            <Scoreboard result={b42ModdedResult} />
           </TabsContent>
         </Tabs>
       </main>

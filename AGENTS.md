@@ -26,9 +26,9 @@
 
 ## Data flow
 
-- `src/lib/env.ts` — `env.B41_API_URL` / `env.B42_API_URL`. URLs are validated at module load; an invalid `B41_API_URL` or `B42_API_URL` env var throws immediately.
-- `src/lib/data.ts` — `B41Player` / `B42Player` types + `getB41PlayerData` / `getB42PlayerData`. Fetch uses `cache: "no-store"` and `AbortSignal.timeout(5_000)`. Throws on error.
-- `src/lib/normalize.ts` — `normalizeB41Player` / `normalizeB42Player` collapse both into `NormalizedPlayer`. B41 path uses a `safeJsonParse` helper that throws `NormalizeError` on bad JSON; a single bad player errors the whole tab.
+- `src/lib/env.ts` — `env.B42_MODDED_API_URL` / `env.B42_VANILLA_API_URL`. URLs are validated at module load; an invalid env var throws immediately. (The b41 `B41_API_URL` entry is commented out — the b41-modded tab was decommissioned; see git history to restore it.)
+- `src/lib/data.ts` — `B42ModdedPlayer` / `B42VanillaPlayer` types + `getB42ModdedPlayerData` / `getB42VanillaPlayerData`. Fetch uses `cache: "no-store"` and `AbortSignal.timeout(5_000)`. Throws on error. (b41 `B41Player` / `getB41PlayerData` commented out.)
+- `src/lib/normalize.ts` — `normalizeB42ModdedPlayer` / `normalizeB42VanillaPlayer` collapse both into `NormalizedPlayer` / `VanillaPlayer`. (The b41 `normalizeB41Player` path + `safeJsonParse`/`NormalizeError` helpers are commented out.)
 - `src/lib/result.ts` — `Result<T>` discriminated union (`{status:"ok",data}` | `{status:"error",error}`) + `tryAsync` helper.
 - The page wraps fetch + normalize in `tryAsync`, then passes each `Result` to `<Scoreboard result={…} />` so one failing upstream shows an error in that tab only.
 

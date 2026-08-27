@@ -1,14 +1,15 @@
 import { env } from "./env";
 
-export interface B41Player {
-  name: string;
-  perks: string;
-  traits: string;
-  stats: string;
-  health: string;
-}
+// b41-modded decommissioned; see git history to bring it back.
+// export interface B41Player {
+//   name: string;
+//   perks: string;
+//   traits: string;
+//   stats: string;
+//   health: string;
+// }
 
-export interface B42Player {
+export interface B42ModdedPlayer {
   username: string;
   online_id: string;
   is_online: boolean;
@@ -28,11 +29,11 @@ export interface B42Player {
   perks: Record<string, number>;
 }
 
-export interface B42Response {
+export interface B42ModdedResponse {
   server: string;
   generated_at: string;
   snapshot_player_count: number;
-  players: B42Player[];
+  players: B42ModdedPlayer[];
 }
 
 export interface B42VanillaPlayer {
@@ -59,12 +60,13 @@ export async function fetchJson<T>(url: string): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-export async function getB41PlayerData(): Promise<B41Player[]> {
-  return fetchJson<B41Player[]>(env.B41_API_URL);
-}
+// b41-modded decommissioned; kept for reference.
+// export async function getB41PlayerData(): Promise<B41Player[]> {
+//   return fetchJson<B41Player[]>(env.B41_API_URL);
+// }
 
-export async function getB42PlayerData(): Promise<B42Player[]> {
-  const data = await fetchJson<B42Response>(env.B42_API_URL);
+export async function getB42ModdedPlayerData(): Promise<B42ModdedPlayer[]> {
+  const data = await fetchJson<B42ModdedResponse>(env.B42_MODDED_API_URL);
   return data.players;
 }
 

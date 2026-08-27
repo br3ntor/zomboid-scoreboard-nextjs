@@ -1,4 +1,4 @@
-import type { B41Player, B42Player, B42VanillaPlayer } from "./data";
+import type { B42ModdedPlayer, B42VanillaPlayer } from "./data";
 
 export interface VanillaPlayer {
   username: string;
@@ -22,60 +22,63 @@ export interface NormalizedPlayer {
   perks: Record<string, number>;
 }
 
-export class NormalizeError extends Error {
-  constructor(
-    message: string,
-    public readonly cause?: unknown,
-  ) {
-    super(message);
-    this.name = "NormalizeError";
-  }
-}
+// b41-modded decommissioned; kept for reference.
+// export class NormalizeError extends Error {
+//   constructor(
+//     message: string,
+//     public readonly cause?: unknown,
+//   ) {
+//     super(message);
+//     this.name = "NormalizeError";
+//   }
+// }
 
-function safeJsonParse<T>(raw: string, context: string): T {
-  try {
-    return JSON.parse(raw) as T;
-  } catch (e) {
-    throw new NormalizeError(
-      `Failed to parse ${context} as JSON: ${(e as Error).message}`,
-      e,
-    );
-  }
-}
+// function safeJsonParse<T>(raw: string, context: string): T {
+//   try {
+//     return JSON.parse(raw) as T;
+//   } catch (e) {
+//     throw new NormalizeError(
+//       `Failed to parse ${context} as JSON: ${(e as Error).message}`,
+//       e,
+//     );
+//   }
+// }
 
-interface B41Stats {
-  hours: number;
-  kills: number;
-  profession: string;
-}
+// interface B41Stats {
+//   hours: number;
+//   kills: number;
+//   profession: string;
+// }
 
-interface B41Health {
-  health: number;
-  infected: boolean;
-}
+// interface B41Health {
+//   health: number;
+//   infected: boolean;
+// }
 
-export function normalizeB41Player(player: B41Player): NormalizedPlayer {
-  const stats = safeJsonParse<B41Stats>(player.stats, "stats");
-  const health = safeJsonParse<B41Health>(player.health, "health");
-  return {
-    displayName: player.name,
-    username: player.name,
-    kills: stats.kills,
-    hours: stats.hours,
-    profession: stats.profession,
-    health: health.health,
-    infected: health.infected,
-    isDead: null,
-    faction: null,
-    gender: null,
-    forename: null,
-    surname: null,
-    traits: safeJsonParse<string[]>(player.traits, "traits"),
-    perks: safeJsonParse<Record<string, number>>(player.perks, "perks"),
-  };
-}
+// export function normalizeB41Player(player: B41Player): NormalizedPlayer {
+//   const stats = safeJsonParse<B41Stats>(player.stats, "stats");
+//   const health = safeJsonParse<B41Health>(player.health, "health");
+//   return {
+//     displayName: player.name,
+//     username: player.name,
+//     kills: stats.kills,
+//     hours: stats.hours,
+//     profession: stats.profession,
+//     health: health.health,
+//     infected: health.infected,
+//     isDead: null,
+//     faction: null,
+//     gender: null,
+//     forename: null,
+//     surname: null,
+//     traits: safeJsonParse<string[]>(player.traits, "traits"),
+//     perks: safeJsonParse<Record<string, number>>(player.perks, "perks"),
+//   };
+// }
 
-export function normalizeB42Player(player: B42Player): NormalizedPlayer {
+export function normalizeB42ModdedPlayer(
+  player: B42ModdedPlayer,
+): NormalizedPlayer {
   const forename = player.forename?.trim() ?? "";
   const surname = player.surname?.trim() ?? "";
   const displayName =

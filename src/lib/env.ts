@@ -9,12 +9,13 @@ function parseUrl(envName: string, fallback: string): string {
 }
 
 export const env = {
-  B41_API_URL: parseUrl(
-    "B41_API_URL",
-    "https://wcn.westcoastnoobs.com/players",
-  ),
-  B42_API_URL: parseUrl(
-    "B42_API_URL",
+  // B41_API_URL decommissioned; see git history to bring it back.
+  // B41_API_URL: parseUrl(
+  //   "B41_API_URL",
+  //   "https://wcn.westcoastnoobs.com/players",
+  // ),
+  B42_MODDED_API_URL: parseUrl(
+    "B42_MODDED_API_URL",
     "https://pz.westcoastnoobs.com/api/leaderboard/kills",
   ),
   B42_VANILLA_API_URL: parseUrl(
