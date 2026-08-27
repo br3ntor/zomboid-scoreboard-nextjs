@@ -13,6 +13,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
           script: |
+            echo "hooray!"
             whoami
             hostname
             pwd
