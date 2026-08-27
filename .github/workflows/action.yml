@@ -1,15 +1,31 @@
-name: Deploy
-on: [push]
-jobs:
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-    steps:
-      - name: executing remote ssh commands using key
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.HOST }}
-          port: ${{ secrets.PORT }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.KEY }}
-          script: ./deploy-pz-scoreboard.sh
+#name: Deploy
+#on: [push]
+#jobs:
+#  build:
+#    name: Build
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: executing remote ssh commands using key
+#        uses: appleboy/ssh-action@v1.0.3
+#        with:
+#          host: ${{ secrets.HOST }}
+#          port: ${{ secrets.PORT }}
+#          username: ${{ secrets.USERNAME }}
+#          key: ${{ secrets.KEY }}
+#          script: ./deploy-pz-scoreboard.sh
+# add this step in place of your current appleboy step (temporary)
+---
+- name: Test SSH connection and environment
+  uses: appleboy/ssh-action@v1.0.3
+  with:
+    host: ${{ secrets.HOST }}
+    port: ${{ secrets.PORT }}
+    username: ${{ secrets.USERNAME }}
+    key: ${{ secrets.KEY }}
+    script: |
+      whoami
+      hostname
+      pwd
+      ls -la ./deploy-pz-scoreboard.sh || echo "script not found at relative path"
+      id
+      env | sort
