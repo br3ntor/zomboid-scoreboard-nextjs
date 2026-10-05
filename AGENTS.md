@@ -42,4 +42,6 @@
 
 ## CI / Deploy
 
+- Production runs under PM2 as the process `pnpm start` on port 3000, defined in `ecosystem.config.cjs`. Operations, deploy steps, and troubleshooting are in **`DEPLOY.md`** — read it before restarting or updating the server.
+- ⚠️ PM2 snapshots `PATH` when its daemon starts, so switching nvm versions or upgrading pnpm does **not** update running processes. After either, run `pm2 kill && pm2 save && pm2 resurrect`, otherwise the next restart fails with `pnpm: command not found`.
 - `.github/workflows/action.yml` runs on every push and SSHes to a host to execute `deploy-pz-scoreboard.sh` (the script is **not** in this repo). No lint, typecheck, or test step runs in CI.
