@@ -38,7 +38,7 @@
 - Tailwind classes are auto-sorted by Prettier on save (plugin enabled in `.prettierrc`)
 - `pnpm-workspace.yaml` is **not** a multi-package setup — it's only used for `allowBuilds` (`sharp`, `unrs-resolver`) and `overrides` patches
 - ESLint is intentionally pinned to v8 (Next 15 still supports it; v9+ would require a flat-config migration). Don't bump it casually.
-- Test files are colocated as `*.test.ts` next to the module they cover; `vitest.config.ts` enforces that pattern via `include`.
+- Test files are colocated as `*.test.ts` next to the module they cover; `vitest.config.mts` enforces that pattern via `include`.
 
 ## CI / Deploy
 
