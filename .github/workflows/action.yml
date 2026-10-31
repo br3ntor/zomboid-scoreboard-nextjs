@@ -19,4 +19,3 @@ jobs:
             pwd
             ls -la ./deploy-pz-scoreboard.sh || echo "script not found at relative path"
             id
-            env | sort
