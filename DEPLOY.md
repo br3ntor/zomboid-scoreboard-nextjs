@@ -31,11 +31,23 @@ pm2 reload ecosystem.config.cjs
 |---|---|
 | Project | `~/projects/zomboid-scoreboard-nextjs` (`wcn-scoreboard`) |
 | Process name | `pnpm start` |
-| Port | `3000` (also bound on the public network IP) |
+| Port | `3000`, **loopback only** (`next start -H 127.0.0.1`); nginx on 443 is the only entry point |
 | Config | `ecosystem.config.cjs` |
 | PM2 home | `~/.pm2` |
 | pnpm | 12.x, global shims in `~/.local/share/pnpm/bin` (`PNPM_HOME/bin`) |
-| Node | nvm default **22.22.0** |
+| Node | **22.23.4**, pinned in `ecosystem.config.cjs` (not inherited from the shell or the daemon) |
+
+Runtime patches applied:
+
+| Date | Change |
+|---|---|
+| 2026-10-23 | Node 22.22.0 → **22.23.4** (the 22.x release of the [2026-10-21 Node security release](https://nodejs.org/en/blog/vulnerability/october-2026-security-releases)); bind changed from all interfaces to loopback; Node + PATH pinned in `ecosystem.config.cjs` |
+| 2026-10-24 | Next 15.5.19 → **15.5.28** and `sharp` **0.35.5** added as a direct dependency — the critical Image Optimization RCEs are fixed by next ≥15.5.28 *and* sharp ≥0.35.5 (librsvg CVE-2026-96889); next's own constraint allows the vulnerable 0.34.x, so sharp must stay pinned. Also overrides for postcss/nanoid/postcss-selector-parser/source-map-js. `pnpm audit --prod` is clean as of this date |
+
+Two things this patch depends on, so don't undo them:
+
+- `sharp` is a **direct** dependency on purpose (`^0.35.5`). Next treats it as optional and will happily resolve 0.34.x, which is vulnerable.
+- `next.config.mjs` pins `images.dangerouslyAllowSVG: false` and an empty `remotePatterns`. Both gates are load-bearing: the optimizer is reachable from the public internet at `/_next/image`, and opening either one re-exposes the RCE class.
 
 ## ⚠️ The two traps that broke this
 
@@ -58,13 +70,33 @@ Both entries were dead, so on the first restart the process died with
 **76 MB** of logs. The process still read as `online` right up until it was
 restarted, because the original process never noticed its environment had rotted.
 
-**After changing Node versions or upgrading pnpm, always run:**
+The long-running "online" status is not proof that a restart will work.
+
+**This trap is now defused for this app**: `ecosystem.config.cjs` sets an
+absolute `script` path and an explicit `PATH` in `env`, so the process no longer
+depends on what the daemon snapshotted. As of 2026-10-23 it is pinned to Node
+**22.23.4** — bump that `PATH` line when you patch Node.
+
+After changing the pinned Node version, the daemon still has to be restarted so
+the *daemon's own* Node is current too:
 
 ```bash
-pm2 kill && pm2 save && pm2 resurrect
+cd ~/projects/zomboid-scoreboard-nextjs
+cp ~/.pm2/dump.pm2 ~/.pm2/dump.pm2.bak-pre-node-upgrade   # keep a rollback copy
+pm2 save                                                 # snapshot the current list
+pm2 kill                                                 # app is DOWN from here
+# start pm2 from a shell where `node -v` is the new version
+pm2 start ecosystem.config.cjs
+pm2 save
 ```
 
-The long-running "online" status is not proof that a restart will work.
+Note the order: `pm2 save` **before** `pm2 kill` — saving after the daemon is
+dead captures nothing.
+
+Anything *not* pinned in the ecosystem file still follows the old rule: after
+switching nvm versions or upgrading pnpm, recreate the process from the
+ecosystem file rather than `pm2 restart`, and verify with
+`readlink -f /proc/$(pm2 pid 'pnpm start')/exe`.
 
 ### 2. Upgrading pnpm moves its global shims
 
@@ -117,6 +149,11 @@ truncate -s 0 ~/.pm2/logs/pnpm-start-out.log ~/.pm2/logs/pnpm-start-error.log
 Truncating is safe — the running process holds the file descriptor and keeps
 writing. It does **not** need a restart.
 
+`Failed to find Server Action "cachefn"` lines in the error log are noise: this
+app defines no server actions, so those requests are failing harmlessly. They
+come from stale clients or from bots probing for Next.js server-action
+endpoints. Only worth a look if the volume changes.
+
 ## Troubleshooting
 
 **Process shows `stopped` with a high restart count**
@@ -126,15 +163,19 @@ pm2 describe 0                 # check exec cwd and interpreter
 tail -30 ~/.pm2/logs/pnpm-start-error.log
 ```
 
-Check for `command not found` — that's trap #1 above. Confirm the stale `PATH`
-with:
+Check for `command not found` — that's trap #1 above. Confirm the `PATH` the
+saved process actually carries:
 
 ```bash
 grep -o '"PATH":"[^"]*"' ~/.pm2/dump.pm2
 ```
 
-Fix by recreating the process from the ecosystem file (which inherits the current
-shell `PATH`) rather than hand-rolled `pm2 start` commands:
+It should name the pinned Node (`.../nvm/versions/node/v22.23.4/bin:...`). An
+older version path there means the ecosystem file was never re-read — recreate
+the process from it.
+
+Fix by recreating the process from the ecosystem file rather than hand-rolled
+`pm2 start` commands:
 
 ```bash
 pm2 delete 0
@@ -163,6 +204,26 @@ pm2 save
 cp ~/.pm2/dump.pm2 ~/.pm2/dump.pm2.bak-$(date +%F)
 pm2 resurrect                # restore from that dump
 ```
+
+**Port 3000 stops answering on the public IP**
+
+Expected — the process is bound to `127.0.0.1` via `args: 'run start -H
+127.0.0.1'` in `ecosystem.config.cjs`. nginx proxies to it from
+`/etc/nginx/sites-available/westcoastnoobs.com.conf`. To go back to all
+interfaces, drop `-H 127.0.0.1` from that line and `pm2 reload`.
+
+**A file deleted from `public/` still answers, with a 400**
+
+Next caches the public-file list when the server starts, so a removed asset
+keeps resolving until the process restarts — and because the file is now
+missing, the response is a `400 Bad Request` error page rather than a `404`.
+Reload to refresh it:
+
+```bash
+pm2 reload ecosystem.config.cjs
+```
+
+After the reload the path returns a clean `404`.
 
 ## Note on CI
 
