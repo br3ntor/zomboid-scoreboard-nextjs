@@ -9,10 +9,10 @@ export interface NormalizedPlayer {
   displayName: string;
   username: string;
   kills: number;
-  hours: number;
-  profession: string;
-  health: number;
-  infected: boolean;
+  hours: number | null;
+  profession: string | null;
+  health: number | null;
+  infected: boolean | null;
   isDead: boolean | null;
   faction: string | null;
   gender: string | null;
@@ -81,23 +81,26 @@ export function normalizeB42ModdedPlayer(
 ): NormalizedPlayer {
   const forename = player.forename?.trim() ?? "";
   const surname = player.surname?.trim() ?? "";
+  const profession = player.profession?.trim() ?? "";
+  const faction = player.faction?.trim() ?? "";
+  const gender = player.gender?.trim() ?? "";
   const displayName =
     forename && surname ? `${forename} ${surname}` : player.username;
   return {
     displayName,
     username: player.username,
     kills: player.zombie_kills,
-    hours: player.hours_survived,
-    profession: player.profession,
-    health: player.health.overall_body_health,
-    infected: player.health.is_infected,
-    isDead: player.is_dead,
-    faction: player.faction?.trim() ? player.faction : null,
-    gender: player.gender,
-    forename: forename ? player.forename : null,
-    surname: surname ? player.surname : null,
-    traits: player.traits,
-    perks: player.perks,
+    hours: player.hours_survived ?? null,
+    profession: profession || null,
+    health: player.health?.overall_body_health ?? null,
+    infected: player.health?.is_infected ?? null,
+    isDead: player.is_dead ?? null,
+    faction: faction || null,
+    gender: gender || null,
+    forename: forename || null,
+    surname: surname || null,
+    traits: Array.isArray(player.traits) ? player.traits : [],
+    perks: player.perks ?? {},
   };
 }
 

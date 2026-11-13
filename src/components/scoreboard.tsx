@@ -21,17 +21,23 @@ import {
 import { Progress } from "@/components/ui/progress";
 import type { NormalizedPlayer } from "@/lib/normalize";
 import type { Result } from "@/lib/result";
-
-const MAX_LEADERBOARD_ROWS = 50;
+import {
+  MAX_LEADERBOARD_ROWS,
+  rankPlayers,
+  type PlayerData,
+  type RankedRow,
+} from "@/lib/scoreboard";
 
 const notoSansMono = Noto_Sans_Mono({ subsets: ["latin"] });
 
-type Row = NormalizedPlayer & { rank: string };
+type Row = RankedRow<NormalizedPlayer>;
 
 export default function Scoreboard({
   result,
+  onlineOnly,
 }: {
-  result: Result<NormalizedPlayer[]>;
+  result: Result<PlayerData<NormalizedPlayer>>;
+  onlineOnly: boolean;
 }) {
   const [selectedPlayer, setSelectedPlayer] = useState<NormalizedPlayer | null>(
     null,
@@ -49,20 +55,22 @@ export default function Scoreboard({
     );
   }
 
-  const players = result.data;
-  if (players.length === 0) return <div>No players yet</div>;
+  const { players, onlinePlayers } = result.data;
+  const showingOnline = onlineOnly && onlinePlayers !== null;
+  const source = onlineOnly && onlinePlayers !== null ? onlinePlayers : players;
 
-  const data: Row[] = players
-    .slice()
-    .sort((a, b) => b.kills - a.kills)
-    .slice(0, MAX_LEADERBOARD_ROWS)
-    .map((player, i) => {
-      const rankNumber = (i + 1).toString();
-      return {
-        ...player,
-        rank: i === 0 ? `👑 ${rankNumber}` : rankNumber,
-      };
-    });
+  if (source.length === 0) {
+    return (
+      <div>
+        {showingOnline ? "No players online right now" : "No players yet"}
+      </div>
+    );
+  }
+
+  const data: Row[] = rankPlayers(
+    source,
+    showingOnline ? undefined : MAX_LEADERBOARD_ROWS,
+  );
 
   return (
     <>
@@ -93,15 +101,17 @@ export default function Scoreboard({
               </TableCell>
               <TableCell className="text-right">{row.kills}</TableCell>
               <TableCell className="text-right">
-                {Math.floor(row.hours)}
+                {row.hours === null ? "—" : Math.floor(row.hours)}
               </TableCell>
               <TableCell className="text-right">
-                {Math.floor(row.health)}
+                {row.health === null ? "—" : Math.floor(row.health)}
               </TableCell>
               <TableCell className="text-right">
-                {row.infected ? "Yes" : "No"}
+                {row.infected === null ? "—" : row.infected ? "Yes" : "No"}
               </TableCell>
-              <TableCell className="text-right">{row.profession}</TableCell>
+              <TableCell className="text-right">
+                {row.profession ?? "—"}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -122,16 +132,31 @@ export default function Scoreboard({
                 <ul className="ml-4 list-disc">
                   <li>Kills: {selectedPlayer.kills}</li>
                   <li>
-                    Time Survived: {Math.floor(selectedPlayer.hours)} hours
+                    Time Survived:{" "}
+                    {selectedPlayer.hours === null
+                      ? "—"
+                      : `${Math.floor(selectedPlayer.hours)} hours`}
                   </li>
-                  <li>Profession: {selectedPlayer.profession}</li>
+                  <li>Profession: {selectedPlayer.profession ?? "—"}</li>
                 </ul>
               </div>
               <div>
                 <div className="font-semibold">Health</div>
                 <ul className="ml-4 list-disc">
-                  <li>Health: {Math.floor(selectedPlayer.health)}</li>
-                  <li>Infected: {selectedPlayer.infected ? "Yes" : "No"}</li>
+                  <li>
+                    Health:{" "}
+                    {selectedPlayer.health === null
+                      ? "—"
+                      : Math.floor(selectedPlayer.health)}
+                  </li>
+                  <li>
+                    Infected:{" "}
+                    {selectedPlayer.infected === null
+                      ? "—"
+                      : selectedPlayer.infected
+                        ? "Yes"
+                        : "No"}
+                  </li>
                 </ul>
               </div>
               {(selectedPlayer.isDead !== null ||
@@ -164,31 +189,39 @@ export default function Scoreboard({
               )}
               <div>
                 <div className="font-semibold">Traits</div>
-                <p className="ml-4">{selectedPlayer.traits.join(", ")}</p>
+                <p className="ml-4">
+                  {selectedPlayer.traits.length > 0
+                    ? selectedPlayer.traits.join(", ")
+                    : "—"}
+                </p>
               </div>
               <div>
                 <div className="font-semibold">Perks</div>
-                <ul className="ml-4 list-none space-y-2">
-                  {Object.entries(selectedPlayer.perks).map(
-                    ([perk, value]: [string, number]) => (
-                      <li key={perk}>
-                        <div className="mb-1 break-words capitalize">
-                          {perk}
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <div className="flex-1">
-                            <Progress
-                              value={Math.max(0, Math.min(10, value)) * 10}
-                            />
+                {Object.keys(selectedPlayer.perks).length > 0 ? (
+                  <ul className="ml-4 list-none space-y-2">
+                    {Object.entries(selectedPlayer.perks).map(
+                      ([perk, value]: [string, number]) => (
+                        <li key={perk}>
+                          <div className="mb-1 break-words capitalize">
+                            {perk}
                           </div>
-                          <span className="ml-2 w-6 text-right tabular-nums">
-                            {value}
-                          </span>
-                        </div>
-                      </li>
-                    ),
-                  )}
-                </ul>
+                          <div className="flex items-center space-x-2">
+                            <div className="flex-1">
+                              <Progress
+                                value={Math.max(0, Math.min(10, value)) * 10}
+                              />
+                            </div>
+                            <span className="ml-2 w-6 text-right tabular-nums">
+                              {value}
+                            </span>
+                          </div>
+                        </li>
+                      ),
+                    )}
+                  </ul>
+                ) : (
+                  <p className="ml-4">—</p>
+                )}
               </div>
             </div>
           )}

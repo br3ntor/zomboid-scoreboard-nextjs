@@ -167,6 +167,56 @@ describe("normalizeB42ModdedPlayer", () => {
     expect(result.health).toBe(50);
     expect(result.infected).toBe(true);
   });
+
+  it("handles a best-effort online player with only username and zombie_kills", () => {
+    const result = normalizeB42ModdedPlayer({
+      username: "partial",
+      zombie_kills: 12,
+    });
+    expect(result).toEqual({
+      displayName: "partial",
+      username: "partial",
+      kills: 12,
+      hours: null,
+      profession: null,
+      health: null,
+      infected: null,
+      isDead: null,
+      faction: null,
+      gender: null,
+      forename: null,
+      surname: null,
+      traits: [],
+      perks: {},
+    });
+  });
+
+  it("treats an empty health object as unknown", () => {
+    const result = normalizeB42ModdedPlayer({
+      username: "partial",
+      zombie_kills: 1,
+      health: {},
+    });
+    expect(result.health).toBeNull();
+    expect(result.infected).toBeNull();
+  });
+
+  it("preserves zero hours and false infected values", () => {
+    const result = normalizeB42ModdedPlayer(
+      makeB42({
+        hours_survived: 0,
+        health: { overall_body_health: 0, is_infected: false },
+      }),
+    );
+    expect(result.hours).toBe(0);
+    expect(result.health).toBe(0);
+    expect(result.infected).toBe(false);
+  });
+
+  it("nulls out whitespace-only profession", () => {
+    const result = normalizeB42ModdedPlayer(makeB42({ profession: "   " }));
+    expect(result.profession).toBeNull();
+  });
 });
 
 describe("normalizeB42VanillaPlayer", () => {

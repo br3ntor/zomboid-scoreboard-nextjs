@@ -1,4 +1,5 @@
 import { env } from "./env";
+import type { PlayerData } from "./scoreboard";
 
 // b41-modded decommissioned; see git history to bring it back.
 // export interface B41Player {
@@ -11,29 +12,32 @@ import { env } from "./env";
 
 export interface B42ModdedPlayer {
   username: string;
-  online_id: string;
-  is_online: boolean;
-  is_dead: boolean;
-  forename: string;
-  surname: string;
-  profession: string;
-  faction: string;
-  gender: string | null;
-  hours_survived: number;
+  online_id?: string;
+  is_online?: boolean;
+  is_dead?: boolean;
+  forename?: string;
+  surname?: string;
+  profession?: string;
+  faction?: string;
+  gender?: string | null;
+  hours_survived?: number;
   zombie_kills: number;
-  health: {
-    overall_body_health: number;
-    is_infected: boolean;
+  health?: {
+    overall_body_health?: number;
+    is_infected?: boolean;
   };
-  traits: string[];
-  perks: Record<string, number>;
+  traits?: string[];
+  perks?: Record<string, number>;
 }
 
 export interface B42ModdedResponse {
   server: string;
   generated_at: string;
   snapshot_player_count: number;
+  online_player_count: number;
+  total_player_count: number;
   players: B42ModdedPlayer[];
+  online_players?: B42ModdedPlayer[] | null;
 }
 
 export interface B42VanillaPlayer {
@@ -46,7 +50,10 @@ export interface B42VanillaResponse {
   server: string;
   generated_at: string;
   snapshot_player_count: number;
+  online_player_count: number;
+  total_player_count: number;
   players: B42VanillaPlayer[];
+  online_players?: B42VanillaPlayer[] | null;
 }
 
 export async function fetchJson<T>(url: string): Promise<T> {
@@ -65,12 +72,26 @@ export async function fetchJson<T>(url: string): Promise<T> {
 //   return fetchJson<B41Player[]>(env.B41_API_URL);
 // }
 
-export async function getB42ModdedPlayerData(): Promise<B42ModdedPlayer[]> {
+export async function getB42ModdedPlayerData(): Promise<
+  PlayerData<B42ModdedPlayer>
+> {
   const data = await fetchJson<B42ModdedResponse>(env.B42_MODDED_API_URL);
-  return data.players;
+  return {
+    players: data.players,
+    onlinePlayers: Array.isArray(data.online_players)
+      ? data.online_players
+      : null,
+  };
 }
 
-export async function getB42VanillaPlayerData(): Promise<B42VanillaPlayer[]> {
+export async function getB42VanillaPlayerData(): Promise<
+  PlayerData<B42VanillaPlayer>
+> {
   const data = await fetchJson<B42VanillaResponse>(env.B42_VANILLA_API_URL);
-  return data.players;
+  return {
+    players: data.players,
+    onlinePlayers: Array.isArray(data.online_players)
+      ? data.online_players
+      : null,
+  };
 }

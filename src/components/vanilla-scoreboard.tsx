@@ -9,17 +9,23 @@ import {
 } from "@/components/ui/table";
 import type { VanillaPlayer } from "@/lib/normalize";
 import type { Result } from "@/lib/result";
-
-const MAX_LEADERBOARD_ROWS = 50;
+import {
+  MAX_LEADERBOARD_ROWS,
+  rankPlayers,
+  type PlayerData,
+  type RankedRow,
+} from "@/lib/scoreboard";
 
 const notoSansMono = Noto_Sans_Mono({ subsets: ["latin"] });
 
-type Row = VanillaPlayer & { rank: string };
+type Row = RankedRow<VanillaPlayer>;
 
 export default function VanillaScoreboard({
   result,
+  onlineOnly,
 }: {
-  result: Result<VanillaPlayer[]>;
+  result: Result<PlayerData<VanillaPlayer>>;
+  onlineOnly: boolean;
 }) {
   if (result.status === "error") {
     return (
@@ -33,20 +39,22 @@ export default function VanillaScoreboard({
     );
   }
 
-  const players = result.data;
-  if (players.length === 0) return <div>No players yet</div>;
+  const { players, onlinePlayers } = result.data;
+  const showingOnline = onlineOnly && onlinePlayers !== null;
+  const source = onlineOnly && onlinePlayers !== null ? onlinePlayers : players;
 
-  const data: Row[] = players
-    .slice()
-    .sort((a, b) => b.kills - a.kills)
-    .slice(0, MAX_LEADERBOARD_ROWS)
-    .map((player, i) => {
-      const rankNumber = (i + 1).toString();
-      return {
-        ...player,
-        rank: i === 0 ? `👑 ${rankNumber}` : rankNumber,
-      };
-    });
+  if (source.length === 0) {
+    return (
+      <div>
+        {showingOnline ? "No players online right now" : "No players yet"}
+      </div>
+    );
+  }
+
+  const data: Row[] = rankPlayers(
+    source,
+    showingOnline ? undefined : MAX_LEADERBOARD_ROWS,
+  );
 
   return (
     <Table className="table-fixed border">

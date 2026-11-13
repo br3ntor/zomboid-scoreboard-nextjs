@@ -1,7 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import Scoreboard from "@/components/scoreboard";
-import VanillaScoreboard from "@/components/vanilla-scoreboard";
+import ScoreboardTabs from "@/components/scoreboard-tabs";
 import Link from "next/link";
 import Image from "next/image";
 import { getB42ModdedPlayerData, getB42VanillaPlayerData } from "@/lib/data";
@@ -17,13 +15,22 @@ import { tryAsync } from "@/lib/result";
 
 export default async function Home() {
   const [b42ModdedResult, b42VanillaResult] = await Promise.all([
-    // tryAsync(async () => (await getB41PlayerData()).map(normalizeB41Player)),
-    tryAsync(async () =>
-      (await getB42ModdedPlayerData()).map(normalizeB42ModdedPlayer),
-    ),
-    tryAsync(async () =>
-      (await getB42VanillaPlayerData()).map(normalizeB42VanillaPlayer),
-    ),
+    tryAsync(async () => {
+      const data = await getB42ModdedPlayerData();
+      return {
+        players: data.players.map(normalizeB42ModdedPlayer),
+        onlinePlayers:
+          data.onlinePlayers?.map(normalizeB42ModdedPlayer) ?? null,
+      };
+    }),
+    tryAsync(async () => {
+      const data = await getB42VanillaPlayerData();
+      return {
+        players: data.players.map(normalizeB42VanillaPlayer),
+        onlinePlayers:
+          data.onlinePlayers?.map(normalizeB42VanillaPlayer) ?? null,
+      };
+    }),
   ]);
   return (
     <div className="mx-auto px-3 md:container lg:max-w-6xl">
@@ -45,22 +52,7 @@ export default async function Home() {
         </Button>
       </header>
       <main className="mb-4">
-        <Tabs defaultValue="b42-vanilla">
-          <TabsList>
-            {/* <TabsTrigger value="b41-modded">b41-modded</TabsTrigger> */}
-            <TabsTrigger value="b42-vanilla">b42-vanilla</TabsTrigger>
-            <TabsTrigger value="b42-modded">b42-modded</TabsTrigger>
-          </TabsList>
-          {/* <TabsContent value="b41-modded">
-            <Scoreboard result={b41Result} />
-          </TabsContent> */}
-          <TabsContent value="b42-vanilla">
-            <VanillaScoreboard result={b42VanillaResult} />
-          </TabsContent>
-          <TabsContent value="b42-modded">
-            <Scoreboard result={b42ModdedResult} />
-          </TabsContent>
-        </Tabs>
+        <ScoreboardTabs vanilla={b42VanillaResult} modded={b42ModdedResult} />
       </main>
     </div>
   );
